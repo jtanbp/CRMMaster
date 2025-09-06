@@ -1,4 +1,7 @@
+# 1. Operating System Library
 import sys
+
+# 2. Third Party Library
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QToolBar,
@@ -7,8 +10,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QMessageBox
 
+# 3. Internal Library
 from database.clientdb.client_widget import ClientPage
 from database.database_functions import get_connection
+from database.partnerdb.partner_widget import PartnerPage
 from database.supplierdb.supplier_widget import SupplierPage
 
 
@@ -63,7 +68,17 @@ class MainWindow(QMainWindow):
             layout.addWidget(SupplierPage(parent=main_window, conn=self.conn))
         if text == 'Client':
             layout.addWidget(ClientPage(parent=main_window, conn=self.conn))
-        else:
+        if text == 'Partner':
+            layout.addWidget(PartnerPage(parent=main_window, conn=self.conn))
+        if text == 'Product':
+            layout.addWidget(QLabel(text))
+        if text == 'Supplier Invoice':
+            layout.addWidget(QLabel(text))
+        if text == 'ClientInvoice':
+            layout.addWidget(QLabel(text))
+        if text == 'Reports':
+            layout.addWidget(QLabel(text))
+        if text == 'Logs':
             layout.addWidget(QLabel(text))
         widget.setLayout(layout)
         return widget
