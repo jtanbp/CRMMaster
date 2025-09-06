@@ -6,8 +6,10 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QMessageBox
+
+from database.clientdb.client_widget import ClientPage
 from database.database_functions import get_connection
-from supplierdb.supplier_widget import SupplierPage
+from database.supplierdb.supplier_widget import SupplierPage
 
 
 class MainWindow(QMainWindow):
@@ -59,6 +61,8 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         if text == '📦Supplier':
             layout.addWidget(SupplierPage(parent=main_window, conn=self.conn))
+        if text == 'Client':
+            layout.addWidget(ClientPage(parent=main_window, conn=self.conn))
         else:
             layout.addWidget(QLabel(text))
         widget.setLayout(layout)
