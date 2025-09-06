@@ -1,4 +1,3 @@
-from database.database_functions import get_connection
 from PySide6.QtWidgets import QMessageBox
 
 def insert_supplier(conn, supplier_name, supplier_contact, supplier_type, status, description):

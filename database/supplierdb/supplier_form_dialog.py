@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QVBoxLayout, QComboBox, QLineEdit, QTextEdit, QLabel, QHBoxLayout
 from core.form_dialog import FormDialog
-from supplierdb.supplier_database import insert_supplier, edit_supplier
+from database.supplierdb.supplier_database import insert_supplier, edit_supplier
 
 class SupplierFormDialog(FormDialog):
     def __init__(self, parent=None, mode='add', supplier_data: dict = None, conn=None):
@@ -33,8 +33,6 @@ class SupplierFormDialog(FormDialog):
         if self.mode == 'edit':
             self.btn_add.setText('Edit Supplier')
             self.btn_add.clicked.connect(self.manage_supplier)
-
-        # self.btn_cancel.clicked.connect(self.reject)
 
     def setup_ui(self):
         # Create a vertical layout for the fields

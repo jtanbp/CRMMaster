@@ -1,13 +1,12 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
-    QTableWidgetItem, QLabel, QPushButton, QMessageBox, QInputDialog, QHeaderView
+    QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView
 )
-from database.database_functions import get_connection
-from supplierdb.supplier_form_dialog import SupplierFormDialog
-from supplierdb.supplier_database import remove_supplier
+from database.clientdb.client_form_dialog import ClientFormDialog
+from database.clientdb.client_database import remove_client
 
 
-class SupplierPage(QWidget):
+class ClientPage(QWidget):
     def __init__(self, parent=None, conn=None):
         super().__init__(parent)
 
@@ -20,7 +19,7 @@ class SupplierPage(QWidget):
         layout = QVBoxLayout(self)
         # Header Row (Label + Buttons)
         header_layout = QHBoxLayout()
-        header_layout.addWidget(QLabel('📦Supplier List'))
+        header_layout.addWidget(QLabel('📦Client List'))
 
         # Refresh Button
         refresh_btn = QPushButton('🔄 Refresh')
@@ -30,14 +29,14 @@ class SupplierPage(QWidget):
 
         # Add Button
         add_btn = QPushButton('➕')
-        add_btn.setToolTip('Add Supplier')
-        add_btn.clicked.connect(self.add_supplier)
+        add_btn.setToolTip('Add Client')
+        add_btn.clicked.connect(self.add_client)
         header_layout.addWidget(add_btn)
 
         # Remove Button
         remove_btn = QPushButton('➖')
-        remove_btn.setToolTip('Remove Supplier')
-        remove_btn.clicked.connect(self.remove_supplier)
+        remove_btn.setToolTip('Remove Client')
+        remove_btn.clicked.connect(self.remove_client)
         header_layout.addWidget(remove_btn)
 
         # Search Function
@@ -55,12 +54,12 @@ class SupplierPage(QWidget):
     def setup_table(self):
         self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels([
-            'Supplier ID', 'Supplier Name', 'Contact', 'Type', 'Status', 'Description'
+            'Client ID', 'Client Name', 'Contact', 'Type', 'Status', 'Description'
         ])
         # Automatically resize certain columns to fit contents
         header = self.table.horizontalHeader()
-        self.table.setColumnHidden(0, True) # Hide the Supplier ID
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)  # Supplier Name
+        self.table.setColumnHidden(0, True) # Hide the client ID
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)  # client Name
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)  # Contact
         header.setSectionResizeMode(3, QHeaderView.ResizeToContents)  # Type
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)  # Status
@@ -71,9 +70,9 @@ class SupplierPage(QWidget):
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QTableWidget.SingleSelection)
-        self.table.cellDoubleClicked.connect(self.edit_supplier)
+        self.table.cellDoubleClicked.connect(self.edit_client)
         header.setSectionsMovable(True)
-        #TODO: Set when double click, a supplier form dialog for editing appears
+        #TODO: Set when double click, a client form dialog for editing appears
 
     # Load Data
     def load_data(self):
@@ -84,8 +83,8 @@ class SupplierPage(QWidget):
         try:
             cur = self.conn.cursor()
             cur.execute("""
-                SELECT supplier_id, supplier_name, supplier_contact, supplier_type, status, description
-                FROM supplier
+                SELECT client_id, client_name, client_contact, client_type, status, description
+                FROM client
                 WHERE deleted_at IS NULL;
             """)
             rows = cur.fetchall()
@@ -96,44 +95,44 @@ class SupplierPage(QWidget):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
             cur.close()
         except Exception as e:
-            QMessageBox.critical(self, 'DB Error', f"⚠️ Failed to fetch suppliers:\n{e}")
+            QMessageBox.critical(self, 'DB Error', f"⚠️ Failed to fetch clients:\n{e}")
 
-    # Add Supplier
-    def add_supplier(self):
-        dialog = SupplierFormDialog(self, 'add', conn=self.conn)
+    # Add Client
+    def add_client(self):
+        dialog = ClientFormDialog(self, 'add', conn=self.conn)
         dialog.exec()
 
-    # Edit Supplier
-    def edit_supplier(self, row):
+    # Edit Client
+    def edit_client(self, row):
         # selected row into a dict
-        supplier_data = {
-            'supplier_id': self.table.item(row, 0).text(),  # hidden ID
-            'supplier_name': self.table.item(row, 1).text(),
-            'supplier_contact': self.table.item(row, 2).text(),
-            'supplier_type': self.table.item(row, 3).text(),
+        client_data = {
+            'client_id': self.table.item(row, 0).text(),  # hidden ID
+            'client_name': self.table.item(row, 1).text(),
+            'client_contact': self.table.item(row, 2).text(),
+            'client_type': self.table.item(row, 3).text(),
             'status': self.table.item(row, 4).text(),
             'description': self.table.item(row, 5).text()
         }
-        dialog = SupplierFormDialog(parent=self, mode='edit', supplier_data=supplier_data, conn=self.conn)
+        dialog = ClientFormDialog(parent=self, mode='edit', client_data=client_data, conn=self.conn)
         dialog.exec()
 
-    # Remove Supplier
-    def remove_supplier(self):
+    # Remove Client
+    def remove_client(self):
         row = self.table.currentRow()
         if row < 0:
-            QMessageBox.warning(self, 'Remove Supplier', '⚠️ Please select a supplier to remove')
+            QMessageBox.warning(self, 'Remove Client', '⚠️ Please select a client to remove')
             return
 
-        supplier_id = self.table.item(row, 0).text()
-        supplier_name = self.table.item(row, 1).text()
+        client_id = self.table.item(row, 0).text()
+        client_name = self.table.item(row, 1).text()
 
         confirm = QMessageBox.question(
             self,
             'Confirm Delete',
-            f"Are you sure you want to delete supplier: {supplier_name}?",
+            f"Are you sure you want to delete client: {client_name}?",
             QMessageBox.Yes | QMessageBox.No
         )
 
         if confirm == QMessageBox.Yes:
-            remove_supplier(self.conn, supplier_id, supplier_name)
+            remove_client(self.conn, client_id, client_name)
             self.table.removeRow(row)
