@@ -52,4 +52,4 @@ build-*/
 
 # Folders to ignore
 /.venv
-database/database_functions.py
+/database/database_functions.py
