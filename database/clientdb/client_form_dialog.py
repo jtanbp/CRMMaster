@@ -23,7 +23,7 @@ class ClientFormDialog(FormDialog):
         self.setup_ui()
 
     def setup(self):
-        self.input_type.addItems(['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other'])
+        self.input_type.addItems(['VIP', 'Client'])
         self.input_status.addItems(['Active', 'Inactive'])
 
         # Connect Signals

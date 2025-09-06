@@ -10,7 +10,9 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QMessageBox
 
+
 # 3. Internal Library
+from core.currency_dialog import CurrencyWindow
 from database.clientdb.client_widget import ClientPage
 from database.database_functions import get_connection
 from database.partnerdb.partner_widget import PartnerPage
@@ -36,6 +38,10 @@ class MainWindow(QMainWindow):
         test_connection = QAction(QIcon(), 'Test Connection', self)
         test_connection.triggered.connect(self.connection_test_window)
         toolbar.addAction(test_connection)
+
+        show_currency = QAction(QIcon(), 'Show Currency Rates', self)
+        show_currency.triggered.connect(self.show_currency_window)
+        toolbar.addAction(show_currency)
 
         # Left Dock (Menu List)
         self.menu_list = QListWidget()
@@ -128,7 +134,6 @@ class MainWindow(QMainWindow):
                     f"✅ Connected to PostgreSQL:\n{version[0]}"
                 )
                 cur.close()
-                self.conn.close()
             except Exception as e:
                 QMessageBox.critical(
                     self,
@@ -141,6 +146,10 @@ class MainWindow(QMainWindow):
                 'Database Connection',
                 '❌ Failed to connect to PostgreSQL!'
             )
+
+    def show_currency_window(self):
+        self.currency_window = CurrencyWindow()
+        self.currency_window.show()
 
 
 if __name__ == "__main__":

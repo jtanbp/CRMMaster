@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Base partner setup widget set up" />
+    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Base partner setup widget set up">
+      <change afterPath="$PROJECT_DIR$/core/currency_pull.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -57,10 +62,11 @@
     "Python.supplier_form_widget.executor": "Run",
     "Python.supplier_widget.executor": "Debug",
     "Python.test_database.executor": "Run",
+    "Python.testfile.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "partnerdatabase",
+    "git-widget-placeholder": "nameconflict",
     "last_opened_file_path": "C:/Users/jowie/PycharmProjects/CRMMaster/database",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -173,7 +179,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CRMMaster$db.coverage" NAME="db Coverage Results" MODIFIED="1756977183530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CRMMaster$main.coverage" NAME="main Coverage Results" MODIFIED="1757127507480" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CRMMaster$main.coverage" NAME="main Coverage Results" MODIFIED="1757133927286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CRMMaster$testfile.coverage" NAME="testfile Coverage Results" MODIFIED="1757129431091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$test_database.coverage" NAME="test_database Coverage Results" MODIFIED="1757054197595" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$supplier_form_widget.coverage" NAME="supplier_form_widget Coverage Results" MODIFIED="1757060899387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/supplierdb" />
     <SUITE FILE_PATH="coverage/CRMMaster$supplier_widget.coverage" NAME="supplier_widget Coverage Results" MODIFIED="1757079521489" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/supplierdb" />
