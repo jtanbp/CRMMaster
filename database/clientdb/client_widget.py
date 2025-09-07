@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
-    QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView
+    QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView, QComboBox, QLineEdit
 )
 from database.clientdb.client_form_dialog import ClientFormDialog
 from database.clientdb.client_database import remove_client
@@ -11,6 +11,8 @@ class ClientPage(QWidget):
         super().__init__(parent)
 
         self.table = QTableWidget() #Stores data
+        self.filter_box = QComboBox()  # For reference when doing searches
+        self.data = {}  # Store data for filtering
         self.setup_ui()
         self.conn = conn
         self.load_data()
@@ -39,10 +41,15 @@ class ClientPage(QWidget):
         remove_btn.clicked.connect(self.remove_client)
         header_layout.addWidget(remove_btn)
 
-        # Search Function
+        # Search bar
+        search_bar = QLineEdit()
+        search_bar.setPlaceholderText('Search client...')
+        search_bar.textChanged.connect(self.filter_table)
+        header_layout.addWidget(search_bar)
 
         # Filter Function (By Category, default being name)
-
+        self.filter_box.addItems(['Client Name', 'Contact', 'Type', 'Status', 'Description'])
+        header_layout.addWidget(self.filter_box)
 
         # Push buttons to the right
         header_layout.addStretch()
@@ -85,12 +92,13 @@ class ClientPage(QWidget):
             cur.execute("""
                 SELECT client_id, client_name, client_contact, client_type, status, description
                 FROM client
-                WHERE deleted_at IS NULL;
+                WHERE deleted_at IS NULL
+                ORDER BY client_id;
             """)
-            rows = cur.fetchall()
+            self.data = cur.fetchall()
 
-            self.table.setRowCount(len(rows))
-            for row_idx, row_data in enumerate(rows):
+            self.table.setRowCount(len(self.data))
+            for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
             cur.close()
@@ -136,3 +144,18 @@ class ClientPage(QWidget):
         if confirm == QMessageBox.Yes:
             remove_client(self.conn, client_id, client_name)
             self.table.removeRow(row)
+
+    def filter_table(self, text):
+        text = text.strip().lower()
+        self.table.setRowCount(0)
+
+        # Which column to filter on (based on combo box selection)
+        filter_col = self.filter_box.currentIndex() + 1 #+1 is because first column is id(PK) which is hidden
+
+        for row_data in self.data:
+            value = str(row_data[filter_col]).lower()
+            if text in value:
+                row_idx = self.table.rowCount()
+                self.table.insertRow(row_idx)
+                for col_idx, col_value in enumerate(row_data):
+                    self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_value)))
