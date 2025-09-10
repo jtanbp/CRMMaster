@@ -4,17 +4,17 @@ import psycopg2
 
 def get_connection():
     try:
-        # conn = psycopg2.connect(
-        #     dbname='onexdb',
-        #     user='jtan',
-        #     password='parkgreen',
-        #     host='localhost',
-        #     port=5432
-        # )
+        conn = psycopg2.connect(
+            dbname='onexdb',
+            user='jtan',
+            password='parkgreen',
+            host='localhost',
+            port=5432
+        )
         #TODO: Set up login for database protection
-        load_dotenv()
-        DATABASE_URL = os.getenv('DATABASE_URL')
-        conn = psycopg2.connect(DATABASE_URL)
+        # load_dotenv()
+        # DATABASE_URL = os.getenv('DATABASE_URL')
+        # conn = psycopg2.connect(DATABASE_URL)
         return conn
     except Exception as e:
         print('Database connection failed:', e)
