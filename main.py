@@ -70,6 +70,8 @@ class MainWindow(QMainWindow):
     def create_page(self, text, main_window=None):
         widget = QWidget()
         layout = QVBoxLayout()
+        if text == '🏠 Welcome to Home Page':
+            layout.addWidget(QLabel(text))
         if text == '📦Supplier':
             layout.addWidget(SupplierPage(parent=main_window, conn=self.conn))
         if text == 'Client':
@@ -80,11 +82,15 @@ class MainWindow(QMainWindow):
             layout.addWidget(QLabel(text))
         if text == 'Supplier Invoice':
             layout.addWidget(QLabel(text))
-        if text == 'ClientInvoice':
+        if text == 'Client Invoice':
             layout.addWidget(QLabel(text))
         if text == 'Reports':
             layout.addWidget(QLabel(text))
         if text == 'Logs':
+            layout.addWidget(QLabel(text))
+        if text == '⚙️ Settings Page':
+            layout.addWidget(QLabel(text))
+        if text == 'ℹ️ About Page':
             layout.addWidget(QLabel(text))
         widget.setLayout(layout)
         return widget
