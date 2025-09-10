@@ -1,3 +1,4 @@
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
     QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView, QComboBox, QLineEdit
@@ -7,6 +8,9 @@ from database.partnerdb.partner_database import remove_partner
 
 
 class PartnerPage(QWidget):
+    partner_saved = Signal(dict)
+    partner_edited = Signal(dict)
+
     def __init__(self, parent=None, conn=None):
         super().__init__(parent)
 
@@ -86,26 +90,26 @@ class PartnerPage(QWidget):
             return
 
         try:
-            cur = self.conn.cursor()
-            cur.execute("""
-                SELECT partner_id, partner_name, partner_contact, description
-                FROM partner
-                WHERE deleted_at IS NULL
-                ORDER BY partner_id;
-            """)
-            self.data = cur.fetchall()
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT partner_id, partner_name, partner_contact, description
+                    FROM partner
+                    WHERE deleted_at IS NULL
+                    ORDER BY partner_id;
+                """)
+                self.data = cur.fetchall()
 
             self.table.setRowCount(len(self.data))
             for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
-            cur.close()
         except Exception as e:
             QMessageBox.critical(self, 'DB Error', f"⚠️ Failed to fetch partners:\n{e}")
 
     # Add partner
     def add_partner(self):
         dialog = PartnerFormDialog(self, 'add', conn=self.conn)
+        # dialog.partner_added.connect(lambda data: self.update_partner_in_table(row, data))
         dialog.exec()
 
     # Edit partner
@@ -118,6 +122,7 @@ class PartnerPage(QWidget):
             'description': self.table.item(row, 3).text()
         }
         dialog = PartnerFormDialog(parent=self, mode='edit', partner_data=partner_data, conn=self.conn)
+        dialog.partner_edited.connect(lambda data: self.update_partner_in_table(row, data))
         dialog.exec()
 
     # Remove partner
@@ -155,3 +160,14 @@ class PartnerPage(QWidget):
                 self.table.insertRow(row_idx)
                 for col_idx, col_value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_value)))
+
+    def update_partner_in_table(self, row, partner_data):
+        updated_row = [
+            str(partner_data["partner_id"]),
+            partner_data["partner_name"],
+            partner_data["partner_contact"],
+            partner_data["description"]
+        ]
+        self.data[row] = updated_row
+        for col_idx, value in enumerate(updated_row):
+            self.table.setItem(row, col_idx, QTableWidgetItem(value))

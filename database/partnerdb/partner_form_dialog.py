@@ -1,8 +1,15 @@
-from PySide6.QtWidgets import QVBoxLayout, QLineEdit, QTextEdit, QLabel, QHBoxLayout
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QPalette, QColor
+from PySide6.QtWidgets import QVBoxLayout, QLineEdit, QTextEdit, QLabel, QHBoxLayout, QMessageBox, QApplication
 from core.form_dialog import FormDialog
-from database.partnerdb.partner_database import insert_partner, edit_partner
+from database.clientdb.client_database import client_name_exists
+from database.partnerdb.partner_database import insert_partner, edit_partner, partner_name_exists
+
 
 class PartnerFormDialog(FormDialog):
+    partner_added = Signal(dict)
+    partner_edited = Signal(dict)
+
     def __init__(self, parent=None, mode='add', partner_data: dict = None, conn=None):
         super().__init__(parent)
 
@@ -15,12 +22,19 @@ class PartnerFormDialog(FormDialog):
         self.mode = mode
         self.conn = conn
         self.partner_data = partner_data
+        self.parent = parent
 
         self.setWindowTitle('📦Partner Form')
         self.setup()
         self.setup_ui()
 
     def setup(self):
+        try:
+            self.btn_add.clicked.disconnect(self.accept)
+        except TypeError:
+            # nothing to disconnect (if already removed)
+            pass
+
         # Connect Signals
         if self.mode == 'add':
             self.btn_add.setText('Add Partner')
@@ -28,6 +42,8 @@ class PartnerFormDialog(FormDialog):
         if self.mode == 'edit':
             self.btn_add.setText('Edit Partner')
             self.btn_add.clicked.connect(self.manage_partner)
+
+        self.input_name.textChanged.connect(self.reset_name_highlight)
 
     def setup_ui(self):
         # Create a vertical layout for the fields
@@ -65,9 +81,56 @@ class PartnerFormDialog(FormDialog):
         contact = self.input_contact.text()
         description = self.input_desc.toPlainText()
 
-        insert_partner(self.conn, name, contact, description)
+        # 🔎 Check uniqueness
+        name_exists = partner_name_exists(self.conn, name)
+        if name_exists:
+            QMessageBox.warning(
+                self,
+                "Duplicate Name",
+                f"A partner with the name '{name}' already exists."
+            )
+            # ✅ highlight the name field in red
+            palette = self.input_name.palette()
+            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            self.input_name.setPalette(palette)
+
+            self.input_name.setFocus()  # put cursor back in the field
+            return  # stop saving
+        elif name_exists is None:
+            self.accept()
+
+        # ✅ If OK, reset palette back to normal
+        self.input_name.setPalette(QApplication.palette())
+
+        partner_data = insert_partner(self.conn, name, contact, description)
+        self.partner_added.emit(partner_data)
+        self.accept()
 
     def manage_partner(self):
+        new_name = self.input_name.text()
+        partner_id = self.partner_data.get("partner_id")
+
+        # 🔎 Check uniqueness
+        name_exists = partner_name_exists(self.conn, new_name, exclude_id=partner_id)
+        if name_exists:
+            QMessageBox.warning(
+                self,
+                "Duplicate Name",
+                f"A partner with the name '{new_name}' already exists."
+            )
+            # ✅ highlight the name field in red
+            palette = self.input_name.palette()
+            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            self.input_name.setPalette(palette)
+
+            self.input_name.setFocus()  # put cursor back in the field
+            return  # stop saving
+        elif name_exists is None:
+            self.accept()
+
+        # ✅ If OK, reset palette back to normal
+        self.input_name.setPalette(QApplication.palette())
+
         partner_data = {
             'partner_id': self.partner_data.get('partner_id'),
             'partner_name': self.input_name.text(),
@@ -76,10 +139,8 @@ class PartnerFormDialog(FormDialog):
         }
 
         edit_partner(self.conn, partner_data)
+        self.partner_edited.emit(partner_data)
+        self.accept()
 
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = PartnerFormDialog()
-#     window.show()   # now works
-#     sys.exit(app.exec())
+    def reset_name_highlight(self):
+        self.input_name.setPalette(QApplication.palette())

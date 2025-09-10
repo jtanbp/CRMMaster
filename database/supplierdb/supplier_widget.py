@@ -1,3 +1,4 @@
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
     QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView, QLineEdit, QComboBox
@@ -7,6 +8,9 @@ from database.supplierdb.supplier_database import remove_supplier
 
 
 class SupplierPage(QWidget):
+    supplier_saved = Signal(dict)
+    supplier_edited = Signal(dict)
+
     def __init__(self, parent=None, conn=None):
         super().__init__(parent)
 
@@ -88,25 +92,25 @@ class SupplierPage(QWidget):
             return
 
         try:
-            cur = self.conn.cursor()
-            cur.execute(
-                "SELECT supplier_id, supplier_name, supplier_contact, supplier_type, status, description\n"
-                "FROM supplier\n"
-                "WHERE deleted_at IS NULL\n"
-                "ORDER BY supplier_id;")
-            self.data = cur.fetchall()
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "SELECT supplier_id, supplier_name, supplier_contact, supplier_type, status, description\n"
+                    "FROM supplier\n"
+                    "WHERE deleted_at IS NULL\n"
+                    "ORDER BY supplier_id;")
+                self.data = cur.fetchall()
 
             self.table.setRowCount(len(self.data))
             for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
-            cur.close()
         except Exception as e:
             QMessageBox.critical(self, 'DB Error', f"⚠️ Failed to fetch suppliers:\n{e}")
 
     # Add Supplier
     def add_supplier(self):
         dialog = SupplierFormDialog(self, 'add', conn=self.conn)
+        # dialog.supplier_edited.connect(lambda data: self.update_supplier_in_table(row, data))
         dialog.exec()
 
     # Edit Supplier
@@ -121,6 +125,7 @@ class SupplierPage(QWidget):
             'description': self.table.item(row, 5).text()
         }
         dialog = SupplierFormDialog(parent=self, mode='edit', supplier_data=supplier_data, conn=self.conn)
+        dialog.supplier_edited.connect(lambda data: self.update_supplier_in_table(row, data))
         dialog.exec()
 
     # Remove Supplier
@@ -159,3 +164,15 @@ class SupplierPage(QWidget):
                 for col_idx, col_value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_value)))
 
+    def update_supplier_in_table(self, row, supplier_data):
+        updated_row = [
+            str(supplier_data["supplier_id"]),
+            supplier_data["supplier_name"],
+            supplier_data["supplier_contact"],
+            supplier_data["supplier_type"],
+            supplier_data["status"],
+            supplier_data["description"]
+        ]
+        self.data[row] = updated_row
+        for col_idx, value in enumerate(updated_row):
+            self.table.setItem(row, col_idx, QTableWidgetItem(value))

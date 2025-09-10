@@ -131,15 +131,14 @@ class MainWindow(QMainWindow):
     def connection_test_window(self):
         if self.conn:
             try:
-                cur = self.conn.cursor()
-                cur.execute('SELECT version();')
-                version = cur.fetchone()
-                QMessageBox.information(
-                    self,
-                    'Database Connection',
-                    f"✅ Connected to PostgreSQL:\n{version[0]}"
-                )
-                cur.close()
+                with self.conn.cursor() as cur:
+                    cur.execute('SELECT version();')
+                    version = cur.fetchone()
+                    QMessageBox.information(
+                        self,
+                        'Database Connection',
+                        f"✅ Connected to PostgreSQL:\n{version[0]}"
+                    )
             except Exception as e:
                 QMessageBox.critical(
                     self,

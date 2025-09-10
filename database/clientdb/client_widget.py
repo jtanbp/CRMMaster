@@ -1,3 +1,4 @@
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
     QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView, QComboBox, QLineEdit
@@ -7,6 +8,9 @@ from database.clientdb.client_database import remove_client
 
 
 class ClientPage(QWidget):
+    client_added = Signal(dict)
+    client_edited = Signal(dict)
+
     def __init__(self, parent=None, conn=None):
         super().__init__(parent)
 
@@ -88,26 +92,26 @@ class ClientPage(QWidget):
             return
 
         try:
-            cur = self.conn.cursor()
-            cur.execute("""
-                SELECT client_id, client_name, client_contact, client_type, status, description
-                FROM client
-                WHERE deleted_at IS NULL
-                ORDER BY client_id;
-            """)
-            self.data = cur.fetchall()
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT client_id, client_name, client_contact, client_type, status, description
+                    FROM client
+                    WHERE deleted_at IS NULL
+                    ORDER BY client_id;
+                """)
+                self.data = cur.fetchall()
 
             self.table.setRowCount(len(self.data))
             for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
-            cur.close()
         except Exception as e:
             QMessageBox.critical(self, 'DB Error', f"⚠️ Failed to fetch clients:\n{e}")
 
     # Add Client
     def add_client(self):
         dialog = ClientFormDialog(self, 'add', conn=self.conn)
+        # dialog.client_added.connect(lambda data: self.update_client_in_table(row, data))
         dialog.exec()
 
     # Edit Client
@@ -122,6 +126,7 @@ class ClientPage(QWidget):
             'description': self.table.item(row, 5).text()
         }
         dialog = ClientFormDialog(parent=self, mode='edit', client_data=client_data, conn=self.conn)
+        dialog.client_edited.connect(lambda data: self.update_client_in_table(row, data))
         dialog.exec()
 
     # Remove Client
@@ -159,3 +164,16 @@ class ClientPage(QWidget):
                 self.table.insertRow(row_idx)
                 for col_idx, col_value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_value)))
+
+    def update_client_in_table(self, row, client_data):
+        updated_row = [
+            str(client_data["client_id"]),
+            client_data["client_name"],
+            client_data["client_contact"],
+            client_data["client_type"],
+            client_data["status"],
+            client_data["description"]
+        ]
+        self.data[row] = updated_row
+        for col_idx, value in enumerate(updated_row):
+            self.table.setItem(row, col_idx, QTableWidgetItem(value))
