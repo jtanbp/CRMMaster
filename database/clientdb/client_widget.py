@@ -153,7 +153,9 @@ class ClientPage(QWidget):
             parent=self, mode='edit', client_data=client_data, conn=self.conn
         )
         dialog.client_edited.connect(
-            lambda data: update_table_row(self.table, row, [data[key] for key in COLUMN_ORDER])
+            lambda data: update_table_row(
+                self.table, row, [data[key] for key in COLUMN_ORDER]
+            )
         )
         dialog.exec()
 

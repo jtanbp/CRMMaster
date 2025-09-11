@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Set up flake8 and pyproject.toml&#10;Linted the entire project">
-      <change afterPath="$PROJECT_DIR$/database/widget_functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/clientdb/client_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/partnerdb/partner_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/partnerdb/partner_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/supplierdb/supplier_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/supplierdb/supplier_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Updated the add function">
+      <change beforePath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/partnerdb/partner_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/partnerdb/partner_form_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/supplierdb/supplier_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/supplierdb/supplier_form_dialog.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +165,7 @@
       <workItem from="1756977069086" duration="35157000" />
       <workItem from="1757173362594" duration="8716000" />
       <workItem from="1757497584650" duration="19597000" />
-      <workItem from="1757554602733" duration="3327000" />
+      <workItem from="1757554602733" duration="3664000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -274,7 +271,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757554579284</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Updated the add function">
+      <option name="closed" value="true" />
+      <created>1757558113005</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1757558113005</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -316,7 +321,8 @@
     <MESSAGE value="Switch back to local database for the meantime" />
     <MESSAGE value="Update feature for unique name check&#10;Fix all the bugs for database cursor query" />
     <MESSAGE value="Set up flake8 and pyproject.toml&#10;Linted the entire project" />
-    <option name="LAST_COMMIT_MESSAGE" value="Set up flake8 and pyproject.toml&#10;Linted the entire project" />
+    <MESSAGE value="Updated the add function" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the add function" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -332,7 +338,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CRMMaster$db.coverage" NAME="db Coverage Results" MODIFIED="1756977183530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$main.coverage" NAME="main Coverage Results" MODIFIED="1757513146682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CRMMaster$run_main.coverage" NAME="run_main Coverage Results" MODIFIED="1757557948909" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
+    <SUITE FILE_PATH="coverage/CRMMaster$run_main.coverage" NAME="run_main Coverage Results" MODIFIED="1757558286642" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
     <SUITE FILE_PATH="coverage/CRMMaster$flake8.coverage" NAME="flake8 Coverage Results" MODIFIED="1757555402861" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
     <SUITE FILE_PATH="coverage/CRMMaster$testfile.coverage" NAME="testfile Coverage Results" MODIFIED="1757129431091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$test_database.coverage" NAME="test_database Coverage Results" MODIFIED="1757054197595" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

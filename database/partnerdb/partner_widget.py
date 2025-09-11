@@ -140,7 +140,9 @@ class PartnerPage(QWidget):
             parent=self, mode='edit', partner_data=partner_data, conn=self.conn
         )
         dialog.partner_edited.connect(
-            lambda data: update_table_row(self.table, row, [data[key] for key in COLUMN_ORDER])
+            lambda data: update_table_row(
+                self.table, row, [data[key] for key in COLUMN_ORDER]
+            )
         )
         dialog.exec()
 

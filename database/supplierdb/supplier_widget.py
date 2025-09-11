@@ -160,7 +160,9 @@ class SupplierPage(QWidget):
             supplier_data=supplier_data,
             conn=self.conn)
         dialog.supplier_edited.connect(
-            lambda data: update_table_row(self.table, row, [data[key] for key in COLUMN_ORDER])
+            lambda data: update_table_row(
+                self.table, row, [data[key] for key in COLUMN_ORDER]
+            )
         )
         dialog.exec()
 

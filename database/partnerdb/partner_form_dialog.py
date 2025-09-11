@@ -95,6 +95,9 @@ class PartnerFormDialog(FormDialog):
             palette.setColor(
                 QPalette.ColorRole.Base, QColor('#ffcccc')
             )  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Text, QColor('black')
+            )  # text color
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field
@@ -126,6 +129,9 @@ class PartnerFormDialog(FormDialog):
             palette.setColor(
                 QPalette.ColorRole.Base, QColor('#ffcccc')
             )  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Text, QColor('black')
+            )  # text color
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field
