@@ -15,8 +15,17 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
-from core import FormDialog
+from core import (
+    FormDialog,
+    validate_characters,
+    validate_max_length,
+    validate_required,
+    validate_selection,
+)
 from database.clientdb import client_name_exists, edit_client, insert_client
+
+client_types = ['VIP', 'Client']
+client_status = ['Active', 'Inactive']
 
 
 class ClientFormDialog(FormDialog):
@@ -44,8 +53,8 @@ class ClientFormDialog(FormDialog):
         self.setup_ui()
 
     def setup(self):
-        self.input_type.addItems(['VIP', 'Client'])
-        self.input_status.addItems(['Active', 'Inactive'])
+        self.input_type.addItems(client_types)
+        self.input_status.addItems(client_status)
 
         try:
             self.btn_add.clicked.disconnect(self.accept)
@@ -107,6 +116,9 @@ class ClientFormDialog(FormDialog):
         self.main_layout.insertLayout(0, self.fields_layout)
 
     def add_client(self):
+        if not self.validate_inputs():
+            return
+
         name = self.input_name.text()
         contact = self.input_contact.text()
         client_type = self.input_type.currentText()
@@ -146,6 +158,9 @@ class ClientFormDialog(FormDialog):
         self.accept()
 
     def manage_client(self):
+        if not self.validate_inputs():
+            return
+
         new_name = self.input_name.text()
         client_id = self.client_data.get('client_id')
 
@@ -190,3 +205,69 @@ class ClientFormDialog(FormDialog):
 
     def reset_name_highlight(self):
         self.input_name.setPalette(QApplication.palette())
+
+    def validate_inputs(self) -> bool:
+        """Validate all client fields."""
+        name = self.input_name.text()
+        contact = self.input_contact.text()
+        client_type = self.input_type.currentText()
+        status = self.input_status.currentText()
+        description = self.input_desc.toPlainText()
+
+        # Validate name
+        if not (validate_required(
+                name,
+                'Client Name',
+                self) and
+                validate_max_length(
+                    name,
+                    100,
+                    'Client Name',
+                    self) and
+                validate_characters(
+                    name,
+                    r"[A-Za-z0-9\s]+",
+                    'Client Name',
+                    self)):
+            self.input_name.setFocus()
+            return False
+
+        # Validate contact (optional)
+        if contact:
+            if not (validate_max_length(
+                    contact,
+                    50,
+                    'Client Contact',
+                    self) and
+                    validate_characters(
+                        contact,
+                        r"[A-Za-z0-9\s\+\-\(\)]*",
+                        'Client Contact',
+                        self)):
+                self.input_contact.setFocus()
+                return False
+
+        # Validate type and status
+        if not validate_selection(
+                client_type,
+                client_types,
+                'Client Type',
+                self):
+            self.input_type.setFocus()
+            return False
+
+        if not validate_selection(
+                status,
+                client_status,
+                'Status',
+                self):
+            self.input_status.setFocus()
+            return False
+
+        # Validate description (optional)
+        if (description and
+                not validate_max_length(description, 500, 'Description', self)):
+            self.input_desc.setFocus()
+            return False
+
+        return True

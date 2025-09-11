@@ -15,8 +15,17 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
-from core import FormDialog
+from core import (
+    FormDialog,
+    validate_characters,
+    validate_max_length,
+    validate_required,
+    validate_selection,
+)
 from database.supplierdb import edit_supplier, insert_supplier, supplier_name_exists
+
+supplier_types = ['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other']
+supplier_status = ['Active', 'Inactive']
 
 
 class SupplierFormDialog(FormDialog):
@@ -44,10 +53,8 @@ class SupplierFormDialog(FormDialog):
         self.setup_ui()
 
     def setup(self):
-        self.input_type.addItems(
-            ['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other']
-        )
-        self.input_status.addItems(['Active', 'Inactive'])
+        self.input_type.addItems(supplier_types)
+        self.input_status.addItems(supplier_status)
 
         try:
             self.btn_add.clicked.disconnect(self.accept)
@@ -109,6 +116,9 @@ class SupplierFormDialog(FormDialog):
         self.main_layout.insertLayout(0, self.fields_layout)
 
     def add_supplier(self):
+        if not self.validate_inputs():
+            return
+
         name = self.input_name.text()
         contact = self.input_contact.text()
         supplier_type = self.input_type.currentText()
@@ -148,6 +158,9 @@ class SupplierFormDialog(FormDialog):
         self.accept()
 
     def manage_supplier(self):
+        if not self.validate_inputs():
+            return
+
         new_name = self.input_name.text()
         supplier_id = self.supplier_data.get('supplier_id')
 
@@ -192,3 +205,69 @@ class SupplierFormDialog(FormDialog):
 
     def reset_name_highlight(self):
         self.input_name.setPalette(QApplication.palette())
+
+    def validate_inputs(self) -> bool:
+        """Validate all client fields."""
+        name = self.input_name.text()
+        contact = self.input_contact.text()
+        supplier_type = self.input_type.currentText()
+        status = self.input_status.currentText()
+        description = self.input_desc.toPlainText()
+
+        # Validate name
+        if not (validate_required(
+                name,
+                'Supplier Name',
+                self) and
+                validate_max_length(
+                    name,
+                    100,
+                    'Supplier Name',
+                    self) and
+                validate_characters(
+                    name,
+                    r"[A-Za-z0-9\s]+",
+                    'Supplier Name',
+                    self)):
+            self.input_name.setFocus()
+            return False
+
+        # Validate contact (optional)
+        if contact:
+            if not (validate_max_length(
+                    contact,
+                    50,
+                    'Supplier Contact',
+                    self) and
+                    validate_characters(
+                        contact,
+                        r"[A-Za-z0-9\s\+\-\(\)]*",
+                        'Supplier Contact',
+                        self)):
+                self.input_contact.setFocus()
+                return False
+
+        # Validate type and status
+        if not validate_selection(
+                supplier_type,
+                supplier_types,
+                'Supplier Type',
+                self):
+            self.input_type.setFocus()
+            return False
+
+        if not validate_selection(
+                status,
+                supplier_status,
+                'Status',
+                self):
+            self.input_status.setFocus()
+            return False
+
+        # Validate description (optional)
+        if (description and
+                not validate_max_length(description, 500, 'Description', self)):
+            self.input_desc.setFocus()
+            return False
+
+        return True

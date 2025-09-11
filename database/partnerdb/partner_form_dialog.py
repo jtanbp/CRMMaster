@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
-from core import FormDialog
+from core import FormDialog, validate_characters, validate_max_length, validate_required
 from database.partnerdb import edit_partner, insert_partner, partner_name_exists
 
 
@@ -89,6 +89,9 @@ class PartnerFormDialog(FormDialog):
         self.main_layout.insertLayout(0, self.fields_layout)
 
     def add_partner(self):
+        if not self.validate_inputs():
+            return
+
         name = self.input_name.text()
         contact = self.input_contact.text()
         description = self.input_desc.toPlainText()
@@ -124,6 +127,9 @@ class PartnerFormDialog(FormDialog):
         self.accept()
 
     def manage_partner(self):
+        if not self.validate_inputs():
+            return
+
         new_name = self.input_name.text()
         partner_id = self.partner_data.get('partner_id')
 
@@ -166,3 +172,50 @@ class PartnerFormDialog(FormDialog):
 
     def reset_name_highlight(self):
         self.input_name.setPalette(QApplication.palette())
+
+    def validate_inputs(self) -> bool:
+        """Validate all client fields."""
+        name = self.input_name.text()
+        contact = self.input_contact.text()
+        description = self.input_desc.toPlainText()
+
+        # Validate name
+        if not (validate_required(
+                name,
+                'Partner Name',
+                self) and
+                validate_max_length(
+                    name,
+                    100,
+                    'Partner Name',
+                    self) and
+                validate_characters(
+                    name,
+                    r"[A-Za-z0-9\s]+",
+                    'Partner Name',
+                    self)):
+            self.input_name.setFocus()
+            return False
+
+        # Validate contact (optional)
+        if contact:
+            if not (validate_max_length(
+                    contact,
+                    50,
+                    'Partner Contact',
+                    self) and
+                    validate_characters(
+                        contact,
+                        r"[A-Za-z0-9\s\+\-\(\)]*",
+                        'Partner Contact',
+                        self)):
+                self.input_contact.setFocus()
+                return False
+
+        # Validate description (optional)
+        if (description and
+                not validate_max_length(description, 500, 'Description', self)):
+            self.input_desc.setFocus()
+            return False
+
+        return True

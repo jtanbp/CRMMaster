@@ -1,7 +1,7 @@
 [project]
-name = "inventory-manager"
+name = "CRM Management App"
 version = "0.1.0"
-description = "A desktop inventory management app with partners and suppliers"
+description = "A CRM Management app with partners and suppliers"
 authors = [
     { name = "Jowie", email = "jtanbp@gmail.com" }
 ]
