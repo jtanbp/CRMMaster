@@ -1,7 +1,7 @@
 # 1. Standard Library
 
 # 2. Third Party Library
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
     QApplication,
@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 # 3. Internal Library
 from core import (
     FormDialog,
+    update_counter,
     validate_characters,
     validate_max_length,
     validate_required,
@@ -43,6 +44,8 @@ class ClientFormDialog(FormDialog):
         self.input_type = QComboBox()
         self.input_status = QComboBox()
         self.input_desc = QTextEdit()
+        self.max_chars = 500
+        self.counter_label = QLabel(f"{self.max_chars} characters remaining")
         self.mode = mode
         self.conn = conn
         self.client_data = client_data
@@ -71,6 +74,9 @@ class ClientFormDialog(FormDialog):
             self.btn_add.clicked.connect(self.manage_client)
 
         self.input_name.textChanged.connect(self.reset_name_highlight)
+        self.input_desc.textChanged.connect(
+            lambda: update_counter(self, self.max_chars)
+        )
 
     def setup_ui(self):
         # Create a vertical layout for the fields
@@ -94,6 +100,10 @@ class ClientFormDialog(FormDialog):
         client_desc_layout.addWidget(QLabel('Description:'))
         client_desc_layout.addWidget(self.input_desc)
 
+        input_counter_layout = QHBoxLayout()
+        input_counter_layout.addWidget(self.counter_label,
+                                       alignment=Qt.AlignmentFlag.AlignRight)
+
         if self.mode == 'edit':
             self.input_name.setText(self.client_data.get('client_name'))
             self.input_contact.setText(self.client_data.get('client_contact'))
@@ -106,6 +116,7 @@ class ClientFormDialog(FormDialog):
         self.fields_layout.addLayout(client_type_layout)
         self.fields_layout.addLayout(client_status_layout)
         self.fields_layout.addLayout(client_desc_layout)
+        self.fields_layout.addLayout(input_counter_layout)
 
         btn_layout = QHBoxLayout()
         btn_layout.addWidget(self.btn_add)

@@ -1,7 +1,7 @@
 # 1. Standard Library
 
 # 2. Third Party Library
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
     QApplication,
@@ -14,7 +14,13 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
-from core import FormDialog, validate_characters, validate_max_length, validate_required
+from core import (
+    FormDialog,
+    update_counter,
+    validate_characters,
+    validate_max_length,
+    validate_required,
+)
 from database.partnerdb import edit_partner, insert_partner, partner_name_exists
 
 
@@ -31,6 +37,8 @@ class PartnerFormDialog(FormDialog):
         self.input_name = QLineEdit()
         self.input_contact = QLineEdit()
         self.input_desc = QTextEdit()
+        self.max_chars = 500
+        self.counter_label = QLabel(f"{self.max_chars} characters remaining")
         self.mode = mode
         self.conn = conn
         self.partner_data = partner_data
@@ -56,6 +64,9 @@ class PartnerFormDialog(FormDialog):
             self.btn_add.clicked.connect(self.manage_partner)
 
         self.input_name.textChanged.connect(self.reset_name_highlight)
+        self.input_desc.textChanged.connect(
+            lambda: update_counter(self, self.max_chars)
+        )
 
     def setup_ui(self):
         # Create a vertical layout for the fields
@@ -71,6 +82,10 @@ class PartnerFormDialog(FormDialog):
         partner_desc_layout.addWidget(QLabel('Description:'))
         partner_desc_layout.addWidget(self.input_desc)
 
+        input_counter_layout = QHBoxLayout()
+        input_counter_layout.addWidget(self.counter_label,
+                                       alignment=Qt.AlignmentFlag.AlignRight)
+
         if self.mode == 'edit':
             self.input_name.setText(self.partner_data.get('partner_name'))
             self.input_contact.setText(self.partner_data.get('partner_contact'))
@@ -79,6 +94,7 @@ class PartnerFormDialog(FormDialog):
         self.fields_layout.addLayout(partner_name_layout)
         self.fields_layout.addLayout(partner_contact_layout)
         self.fields_layout.addLayout(partner_desc_layout)
+        self.fields_layout.addLayout(input_counter_layout)
 
         btn_layout = QHBoxLayout()
         btn_layout.addWidget(self.btn_add)

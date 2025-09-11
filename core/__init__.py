@@ -6,12 +6,13 @@ from core.validators import (
     validate_required,
     validate_selection,
 )
-from core.widget_utils import update_refresh_btn
+from core.widget_utils import update_counter, update_refresh_btn
 
 # Explicitly define what this package exports
 __all__ = [
     'CurrencyWindow',
     'FormDialog',
+    'update_counter',
     'update_refresh_btn',
     'validate_characters',
     'validate_max_length',
