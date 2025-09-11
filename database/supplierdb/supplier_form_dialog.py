@@ -1,10 +1,11 @@
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QPalette, QColor
-from PySide6.QtWidgets import QVBoxLayout, QComboBox, QLineEdit, QTextEdit, QLabel, QHBoxLayout, QMessageBox, \
-    QApplication
+from PySide6.QtWidgets import (QVBoxLayout, QComboBox, QLineEdit,
+                               QTextEdit, QLabel, QHBoxLayout,
+                               QMessageBox, QApplication)
 from core.form_dialog import FormDialog
-from database.clientdb.client_database import client_name_exists
-from database.supplierdb.supplier_database import insert_supplier, edit_supplier, supplier_name_exists
+from database.supplierdb.supplier_database import (
+    insert_supplier, edit_supplier, supplier_name_exists)
 
 
 class SupplierFormDialog(FormDialog):
@@ -32,7 +33,9 @@ class SupplierFormDialog(FormDialog):
         self.setup_ui()
 
     def setup(self):
-        self.input_type.addItems(['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other'])
+        self.input_type.addItems(
+            ['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other']
+        )
         self.input_status.addItems(['Active', 'Inactive'])
 
         try:
@@ -106,12 +109,14 @@ class SupplierFormDialog(FormDialog):
         if name_exists:
             QMessageBox.warning(
                 self,
-                "Duplicate Name",
+                'Duplicate Name',
                 f"A supplier with the name '{name}' already exists."
             )
             # ✅ highlight the name field in red
             palette = self.input_name.palette()
-            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field
@@ -122,25 +127,29 @@ class SupplierFormDialog(FormDialog):
         # ✅ If OK, reset palette back to normal
         self.input_name.setPalette(QApplication.palette())
 
-        supplier_data = insert_supplier(self.conn, name, contact, supplier_type, status, description)
+        supplier_data = insert_supplier(
+            self.conn, name, contact, supplier_type, status, description
+        )
         self.supplier_added.emit(supplier_data)
         self.accept()
 
     def manage_supplier(self):
         new_name = self.input_name.text()
-        supplier_id = self.supplier_data.get("supplier_id")
+        supplier_id = self.supplier_data.get('supplier_id')
 
         # 🔎 Check uniqueness
         name_exist = supplier_name_exists(self.conn, new_name, exclude_id=supplier_id)
         if name_exist:
             QMessageBox.warning(
                 self,
-                "Duplicate Name",
+                'Duplicate Name',
                 f"A supplier with the name '{new_name}' already exists."
             )
             # ✅ highlight the name field in red
             palette = self.input_name.palette()
-            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field

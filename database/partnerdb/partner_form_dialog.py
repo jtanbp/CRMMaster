@@ -1,9 +1,10 @@
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QPalette, QColor
-from PySide6.QtWidgets import QVBoxLayout, QLineEdit, QTextEdit, QLabel, QHBoxLayout, QMessageBox, QApplication
+from PySide6.QtWidgets import (QVBoxLayout, QLineEdit, QTextEdit,
+                               QLabel, QHBoxLayout, QMessageBox, QApplication)
 from core.form_dialog import FormDialog
-from database.clientdb.client_database import client_name_exists
-from database.partnerdb.partner_database import insert_partner, edit_partner, partner_name_exists
+from database.partnerdb.partner_database import (
+    insert_partner, edit_partner, partner_name_exists)
 
 
 class PartnerFormDialog(FormDialog):
@@ -86,12 +87,14 @@ class PartnerFormDialog(FormDialog):
         if name_exists:
             QMessageBox.warning(
                 self,
-                "Duplicate Name",
+                'Duplicate Name',
                 f"A partner with the name '{name}' already exists."
             )
             # ✅ highlight the name field in red
             palette = self.input_name.palette()
-            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field
@@ -108,19 +111,21 @@ class PartnerFormDialog(FormDialog):
 
     def manage_partner(self):
         new_name = self.input_name.text()
-        partner_id = self.partner_data.get("partner_id")
+        partner_id = self.partner_data.get('partner_id')
 
         # 🔎 Check uniqueness
         name_exists = partner_name_exists(self.conn, new_name, exclude_id=partner_id)
         if name_exists:
             QMessageBox.warning(
                 self,
-                "Duplicate Name",
+                'Duplicate Name',
                 f"A partner with the name '{new_name}' already exists."
             )
             # ✅ highlight the name field in red
             palette = self.input_name.palette()
-            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field

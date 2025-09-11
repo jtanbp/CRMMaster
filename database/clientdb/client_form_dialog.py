@@ -1,9 +1,11 @@
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QPalette, QColor
-from PySide6.QtWidgets import QVBoxLayout, QComboBox, QLineEdit, QTextEdit, QLabel, QHBoxLayout, QMessageBox, \
-    QApplication
+from PySide6.QtWidgets import (QVBoxLayout, QComboBox, QLineEdit,
+                               QTextEdit, QLabel, QHBoxLayout,
+                               QMessageBox, QApplication)
 from core.form_dialog import FormDialog
-from database.clientdb.client_database import insert_client, edit_client, client_name_exists
+from database.clientdb.client_database import (
+    insert_client, edit_client, client_name_exists)
 
 
 class ClientFormDialog(FormDialog):
@@ -105,12 +107,14 @@ class ClientFormDialog(FormDialog):
         if name_exists:
             QMessageBox.warning(
                 self,
-                "Duplicate Name",
+                'Duplicate Name',
                 f"A client with the name '{name}' already exists."
             )
             # ✅ highlight the name field in red
             palette = self.input_name.palette()
-            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field
@@ -121,25 +125,29 @@ class ClientFormDialog(FormDialog):
         # ✅ If OK, reset palette back to normal
         self.input_name.setPalette(QApplication.palette())
 
-        client_data = insert_client(self.conn, name, contact, client_type, status, description)
+        client_data = insert_client(
+            self.conn, name, contact, client_type, status, description
+        )
         self.client_added.emit(client_data)
         self.accept()
 
     def manage_client(self):
         new_name = self.input_name.text()
-        client_id = self.client_data.get("client_id")
+        client_id = self.client_data.get('client_id')
 
         # 🔎 Check uniqueness
         name_exists = client_name_exists(self.conn, new_name, exclude_id=client_id)
         if name_exists:
             QMessageBox.warning(
                 self,
-                "Duplicate Name",
+                'Duplicate Name',
                 f"A client with the name '{new_name}' already exists."
             )
             # ✅ highlight the name field in red
             palette = self.input_name.palette()
-            palette.setColor(QPalette.Base, QColor("#ffcccc"))  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
             self.input_name.setPalette(palette)
 
             self.input_name.setFocus()  # put cursor back in the field

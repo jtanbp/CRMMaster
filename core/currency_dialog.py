@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QThread, Signal
 
+
 # Thread to fetch rates
 class FetchRatesThread(QThread):
     finished = Signal(dict)  # Emit rates as a dictionary
@@ -43,7 +44,7 @@ class CurrencyWindow(QWidget):
         self.table = QTableWidget()
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(['Currency', 'Rate'])
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.verticalHeader().setVisible(False)
         layout.addWidget(self.table)
@@ -67,7 +68,8 @@ class CurrencyWindow(QWidget):
 
         # Create two lists: preferred first, then the rest sorted
         preferred_rates = [(cur, rates[cur]) for cur in preferred if cur in rates]
-        other_rates = sorted((cur, rate) for cur, rate in rates.items() if cur not in preferred)
+        other_rates = sorted((cur, rate) for cur, rate
+                             in rates.items() if cur not in preferred)
 
         final_list = preferred_rates + other_rates
 
@@ -83,5 +85,7 @@ class CurrencyWindow(QWidget):
         for row, (currency, rate) in enumerate(sorted(self.rates.items())):
             if text in currency:
                 self.table.insertRow(self.table.rowCount())
-                self.table.setItem(self.table.rowCount()-1, 0, QTableWidgetItem(currency))
-                self.table.setItem(self.table.rowCount()-1, 1, QTableWidgetItem(f"{rate:.4f}"))
+                self.table.setItem(
+                    self.table.rowCount()-1, 0, QTableWidgetItem(currency))
+                self.table.setItem(
+                    self.table.rowCount()-1, 1, QTableWidgetItem(f"{rate:.4f}"))

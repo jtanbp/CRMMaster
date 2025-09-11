@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QMessageBox
 
-
 # 3. Internal Library
 from core.currency_dialog import CurrencyWindow
 from database.clientdb.client_widget import ClientPage
@@ -25,7 +24,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('CRMMaster')
         self.resize(1200, 600)
 
-        self.conn = get_connection() #This will be the main connection for any query to the SQL database
+        # This will be the main connection for any query to the SQL database
+        self.conn = get_connection()
 
         # Toolbar
         toolbar = QToolBar('Main Toolbar')
@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
 
         # Add pages based on privileges
         # 0 = super admin/master, 1 = admin, 2 = accounting, 3 = sales, 4 = others
-        self.privilege = 0 # TODO: Set this once login is set up
+        self.privilege = 0  # TODO: Set this once login is set up
         self.pages = {'Home': self.create_page('🏠 Welcome to Home Page')}
         self.menu_list.addItem('Home')
         self.privileged_pages()
