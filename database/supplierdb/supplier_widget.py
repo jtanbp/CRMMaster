@@ -1,16 +1,53 @@
+# 1. Standard Library
+
+# 2. Third Party Library
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
-    QTableWidgetItem, QLabel, QPushButton, QMessageBox, QHeaderView
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
-from database.supplierdb.supplier_form_dialog import SupplierFormDialog
-from database.supplierdb.supplier_database import remove_supplier
+
+# 3. Internal Library
+from core import update_refresh_btn
+from database.supplierdb import SupplierFormDialog, remove_supplier
+from database.table_utils import (
+    add_table_row,
+    filter_table,
+    setup_table_ui,
+    update_table_row,
+)
+
+# Define the column order matching your QTableWidget
+COLUMN_ORDER = [
+    'supplier_id',
+    'supplier_name',
+    'supplier_contact',
+    'supplier_type',
+    'status',
+    'description'
+]
 
 
 class SupplierPage(QWidget):
+    supplier_saved = Signal(dict)
+    supplier_edited = Signal(dict)
+
     def __init__(self, parent=None, conn=None):
         super().__init__(parent)
 
-        self.table = QTableWidget() #Stores data
+        self.refresh_btn = QPushButton('🔄 Refresh')  # Pushbutton Refresh Notification
+        self.table = QTableWidget()  # Stores data
+        self.filter_box = QComboBox()  # For reference when doing searches
+        self.data = {}  # Store data for filtering
         self.setup_ui()
         self.conn = conn
         self.load_data()
@@ -22,10 +59,8 @@ class SupplierPage(QWidget):
         header_layout.addWidget(QLabel('📦Supplier List'))
 
         # Refresh Button
-        refresh_btn = QPushButton('🔄 Refresh')
-        refresh_btn.clicked.connect(self.load_data)
-        header_layout.addWidget(refresh_btn)
-        #TODO: Add a status bar at the bottom to give notifaction when successful or when it fails
+        self.refresh_btn.clicked.connect(self.load_data)
+        header_layout.addWidget(self.refresh_btn)
 
         # Add Button
         add_btn = QPushButton('➕')
@@ -39,10 +74,17 @@ class SupplierPage(QWidget):
         remove_btn.clicked.connect(self.remove_supplier)
         header_layout.addWidget(remove_btn)
 
-        # Search Function
+        # Search bar
+        search_bar = QLineEdit()
+        search_bar.setPlaceholderText('Search supplier...')
+        search_bar.textChanged.connect(lambda text: filter_table(self, text))
+        header_layout.addWidget(search_bar)
 
         # Filter Function (By Category, default being name)
-
+        self.filter_box.addItems(
+            ['Supplier Name', 'Contact', 'Type', 'Status', 'Description']
+        )
+        header_layout.addWidget(self.filter_box)
 
         # Push buttons to the right
         header_layout.addStretch()
@@ -58,48 +100,63 @@ class SupplierPage(QWidget):
         ])
         # Automatically resize certain columns to fit contents
         header = self.table.horizontalHeader()
-        self.table.setColumnHidden(0, True) # Hide the Supplier ID
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)  # Supplier Name
-        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)  # Contact
-        header.setSectionResizeMode(3, QHeaderView.ResizeToContents)  # Type
-        header.setSectionResizeMode(4, QHeaderView.ResizeToContents)  # Status
-
-        # Optional: make one column stretch to fill remaining space
-        header.setSectionResizeMode(5, QHeaderView.Stretch)  # Desc can be stretched
-
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.table.setSelectionBehavior(QTableWidget.SelectRows)
-        self.table.setSelectionMode(QTableWidget.SingleSelection)
-        self.table.cellDoubleClicked.connect(self.edit_supplier)
-        header.setSectionsMovable(True)
-        #TODO: Set when double click, a supplier form dialog for editing appears
+        header.setSectionResizeMode(
+            1, QHeaderView.ResizeMode.ResizeToContents
+        )  # Supplier Name
+        header.setSectionResizeMode(
+            2, QHeaderView.ResizeMode.ResizeToContents
+        )  # Contact
+        header.setSectionResizeMode(
+            3, QHeaderView.ResizeMode.ResizeToContents
+        )  # Type
+        header.setSectionResizeMode(
+            4, QHeaderView.ResizeMode.ResizeToContents
+        )  # Status
+        header.setSectionResizeMode(
+            5, QHeaderView.ResizeMode.Stretch
+        )  # Stretch Desc
+        setup_table_ui(self.table, self.edit_supplier)
 
     # Load Data
     def load_data(self):
         if not self.conn:
-            QMessageBox.critical(self, 'DB Error', '❌ Could not connect to database')
+            QMessageBox.critical(self,
+                                 'DB Error',
+                                 '❌ Could not connect to database')
             return
 
         try:
-            cur = self.conn.cursor()
-            cur.execute("""
-                SELECT supplier_id, supplier_name, supplier_contact, supplier_type, status, description
-                FROM supplier
-                WHERE deleted_at IS NULL;
-            """)
-            rows = cur.fetchall()
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "SELECT supplier_id, "
+                    "supplier_name, "
+                    "supplier_contact, "
+                    "supplier_type, "
+                    "status, "
+                    "description\n"
+                    "FROM supplier\n"
+                    "WHERE deleted_at IS NULL\n"
+                    "ORDER BY supplier_id;")
+                self.data = cur.fetchall()
 
-            self.table.setRowCount(len(rows))
-            for row_idx, row_data in enumerate(rows):
+            self.table.setRowCount(len(self.data))
+            for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
-            cur.close()
+            update_refresh_btn(self.refresh_btn, True)
         except Exception as e:
-            QMessageBox.critical(self, 'DB Error', f"⚠️ Failed to fetch suppliers:\n{e}")
+            update_refresh_btn(self.refresh_btn, False)
+            QMessageBox.critical(
+                self,
+                'DB Error',
+                f"⚠️ Failed to fetch suppliers:\n{e}")
 
     # Add Supplier
     def add_supplier(self):
         dialog = SupplierFormDialog(self, 'add', conn=self.conn)
+        dialog.supplier_added.connect(
+            lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
+        )
         dialog.exec()
 
     # Edit Supplier
@@ -113,14 +170,24 @@ class SupplierPage(QWidget):
             'status': self.table.item(row, 4).text(),
             'description': self.table.item(row, 5).text()
         }
-        dialog = SupplierFormDialog(parent=self, mode='edit', supplier_data=supplier_data, conn=self.conn)
+        dialog = SupplierFormDialog(
+            parent=self,
+            mode='edit',
+            supplier_data=supplier_data,
+            conn=self.conn)
+        dialog.supplier_edited.connect(
+            lambda data: update_table_row(
+                self.table, row, [data[key] for key in COLUMN_ORDER]
+            )
+        )
         dialog.exec()
 
     # Remove Supplier
     def remove_supplier(self):
         row = self.table.currentRow()
         if row < 0:
-            QMessageBox.warning(self, 'Remove Supplier', '⚠️ Please select a supplier to remove')
+            QMessageBox.warning(self, 'Remove Supplier',
+                                '⚠️ Please select a supplier to remove')
             return
 
         supplier_id = self.table.item(row, 0).text()
@@ -130,9 +197,9 @@ class SupplierPage(QWidget):
             self,
             'Confirm Delete',
             f"Are you sure you want to delete supplier: {supplier_name}?",
-            QMessageBox.Yes | QMessageBox.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
 
-        if confirm == QMessageBox.Yes:
+        if confirm == QMessageBox.StandardButton.Yes:
             remove_supplier(self.conn, supplier_id, supplier_name)
             self.table.removeRow(row)

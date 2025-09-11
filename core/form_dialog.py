@@ -1,15 +1,26 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QSizePolicy, QHBoxLayout, QPushButton
+# 1. Standard Library
+
+# 2. Third Party Library
+from PySide6.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QPushButton,
+    QSizePolicy,
+    QVBoxLayout,
+)
+
+# 3. Internal Library
 
 
 class FormDialog(QDialog):
-    def __init__(self, parent=None, mode = 'add'):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Form Dialog")
 
         self.main_layout = QVBoxLayout(self)
         self.btn_add = QPushButton('Accept')
         self.btn_cancel = QPushButton('Cancel')
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         self.setMinimumSize(500, 500)
         self.setMaximumSize(500, 16777215)
         button_layout = QHBoxLayout()
@@ -22,15 +33,7 @@ class FormDialog(QDialog):
         self.main_layout.addLayout(button_layout)
         self.setLayout(self.main_layout)
 
-
     def setup_buttons(self):
         # Standard button wiring
         self.btn_add.clicked.connect(self.accept)  # close with Accepted
         self.btn_cancel.clicked.connect(self.reject)
-
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = FormDialog()
-#     window.show()   # now works
-#     sys.exit(app.exec())

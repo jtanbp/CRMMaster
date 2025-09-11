@@ -1,8 +1,28 @@
-from PySide6.QtWidgets import QVBoxLayout, QComboBox, QLineEdit, QTextEdit, QLabel, QHBoxLayout
-from core.form_dialog import FormDialog
-from database.clientdb.client_database import insert_client, edit_client
+# 1. Standard Library
+
+# 2. Third Party Library
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QColor, QPalette
+from PySide6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QTextEdit,
+    QVBoxLayout,
+)
+
+# 3. Internal Library
+from core import FormDialog
+from database.clientdb import client_name_exists, edit_client, insert_client
+
 
 class ClientFormDialog(FormDialog):
+    client_added = Signal(dict)
+    client_edited = Signal(dict)
+
     def __init__(self, parent=None, mode='add', client_data: dict = None, conn=None):
         super().__init__(parent)
 
@@ -17,14 +37,21 @@ class ClientFormDialog(FormDialog):
         self.mode = mode
         self.conn = conn
         self.client_data = client_data
+        self.parent = parent
 
         self.setWindowTitle('📦Client Form')
         self.setup()
         self.setup_ui()
 
     def setup(self):
-        self.input_type.addItems(['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other'])
+        self.input_type.addItems(['VIP', 'Client'])
         self.input_status.addItems(['Active', 'Inactive'])
+
+        try:
+            self.btn_add.clicked.disconnect(self.accept)
+        except TypeError:
+            # nothing to disconnect (if already removed)
+            pass
 
         # Connect Signals
         if self.mode == 'add':
@@ -33,6 +60,8 @@ class ClientFormDialog(FormDialog):
         if self.mode == 'edit':
             self.btn_add.setText('Edit Client')
             self.btn_add.clicked.connect(self.manage_client)
+
+        self.input_name.textChanged.connect(self.reset_name_highlight)
 
     def setup_ui(self):
         # Create a vertical layout for the fields
@@ -84,9 +113,68 @@ class ClientFormDialog(FormDialog):
         status = self.input_status.currentText()
         description = self.input_desc.toPlainText()
 
-        insert_client(self.conn, name, contact, client_type, status, description)
+        # 🔎 Check uniqueness
+        name_exists = client_name_exists(self.conn, name)
+        if name_exists:
+            QMessageBox.warning(
+                self,
+                'Duplicate Name',
+                f"A client with the name '{name}' already exists."
+            )
+            # ✅ highlight the name field in red
+            palette = self.input_name.palette()
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Text, QColor('black')
+            )  # text color
+            self.input_name.setPalette(palette)
+
+            self.input_name.setFocus()  # put cursor back in the field
+            return  # stop saving
+        elif name_exists is None:
+            self.accept()
+
+        # ✅ If OK, reset palette back to normal
+        self.input_name.setPalette(QApplication.palette())
+
+        client_data = insert_client(
+            self.conn, name, contact, client_type, status, description
+        )
+        self.client_added.emit(client_data)
+        self.accept()
 
     def manage_client(self):
+        new_name = self.input_name.text()
+        client_id = self.client_data.get('client_id')
+
+        # 🔎 Check uniqueness
+        name_exists = client_name_exists(self.conn, new_name, exclude_id=client_id)
+        if name_exists:
+            QMessageBox.warning(
+                self,
+                'Duplicate Name',
+                f"A client with the name '{new_name}' already exists."
+            )
+            # ✅ highlight the name field in red
+            palette = self.input_name.palette()
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Text, QColor('black')
+            )  # text color
+            self.input_name.setPalette(palette)
+
+            self.input_name.setFocus()  # put cursor back in the field
+            return  # stop saving
+        elif name_exists is None:
+            self.accept()
+
+        # ✅ If OK, reset palette back to normal
+        self.input_name.setPalette(QApplication.palette())
+
         client_data = {
             'client_id': self.client_data.get('client_id'),
             'client_name': self.input_name.text(),
@@ -97,10 +185,8 @@ class ClientFormDialog(FormDialog):
         }
 
         edit_client(self.conn, client_data)
+        self.client_edited.emit(client_data)
+        self.accept()
 
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = ClientFormDialog()
-#     window.show()   # now works
-#     sys.exit(app.exec())
+    def reset_name_highlight(self):
+        self.input_name.setPalette(QApplication.palette())

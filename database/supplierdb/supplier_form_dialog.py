@@ -1,8 +1,28 @@
-from PySide6.QtWidgets import QVBoxLayout, QComboBox, QLineEdit, QTextEdit, QLabel, QHBoxLayout
-from core.form_dialog import FormDialog
-from database.supplierdb.supplier_database import insert_supplier, edit_supplier
+# 1. Standard Library
+
+# 2. Third Party Library
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QColor, QPalette
+from PySide6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QTextEdit,
+    QVBoxLayout,
+)
+
+# 3. Internal Library
+from core import FormDialog
+from database.supplierdb import edit_supplier, insert_supplier, supplier_name_exists
+
 
 class SupplierFormDialog(FormDialog):
+    supplier_added = Signal(dict)
+    supplier_edited = Signal(dict)
+
     def __init__(self, parent=None, mode='add', supplier_data: dict = None, conn=None):
         super().__init__(parent)
 
@@ -17,14 +37,23 @@ class SupplierFormDialog(FormDialog):
         self.mode = mode
         self.conn = conn
         self.supplier_data = supplier_data
+        self.parent = parent
 
         self.setWindowTitle('📦Supplier Form')
         self.setup()
         self.setup_ui()
 
     def setup(self):
-        self.input_type.addItems(['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other'])
+        self.input_type.addItems(
+            ['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other']
+        )
         self.input_status.addItems(['Active', 'Inactive'])
+
+        try:
+            self.btn_add.clicked.disconnect(self.accept)
+        except TypeError:
+            # nothing to disconnect (if already removed)
+            pass
 
         # Connect Signals
         if self.mode == 'add':
@@ -33,6 +62,8 @@ class SupplierFormDialog(FormDialog):
         if self.mode == 'edit':
             self.btn_add.setText('Edit Supplier')
             self.btn_add.clicked.connect(self.manage_supplier)
+
+        self.input_name.textChanged.connect(self.reset_name_highlight)
 
     def setup_ui(self):
         # Create a vertical layout for the fields
@@ -84,9 +115,68 @@ class SupplierFormDialog(FormDialog):
         status = self.input_status.currentText()
         description = self.input_desc.toPlainText()
 
-        insert_supplier(self.conn, name, contact, supplier_type, status, description)
+        # 🔎 Check uniqueness
+        name_exists = supplier_name_exists(self.conn, name)
+        if name_exists:
+            QMessageBox.warning(
+                self,
+                'Duplicate Name',
+                f"A supplier with the name '{name}' already exists."
+            )
+            # ✅ highlight the name field in red
+            palette = self.input_name.palette()
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Text, QColor('black')
+            )  # text color
+            self.input_name.setPalette(palette)
+
+            self.input_name.setFocus()  # put cursor back in the field
+            return  # stop saving
+        elif name_exists is None:
+            self.accept()
+
+        # ✅ If OK, reset palette back to normal
+        self.input_name.setPalette(QApplication.palette())
+
+        supplier_data = insert_supplier(
+            self.conn, name, contact, supplier_type, status, description
+        )
+        self.supplier_added.emit(supplier_data)
+        self.accept()
 
     def manage_supplier(self):
+        new_name = self.input_name.text()
+        supplier_id = self.supplier_data.get('supplier_id')
+
+        # 🔎 Check uniqueness
+        name_exist = supplier_name_exists(self.conn, new_name, exclude_id=supplier_id)
+        if name_exist:
+            QMessageBox.warning(
+                self,
+                'Duplicate Name',
+                f"A supplier with the name '{new_name}' already exists."
+            )
+            # ✅ highlight the name field in red
+            palette = self.input_name.palette()
+            palette.setColor(
+                QPalette.ColorRole.Base, QColor('#ffcccc')
+            )  # light red background
+            palette.setColor(
+                QPalette.ColorRole.Text, QColor('black')
+            )  # text color
+            self.input_name.setPalette(palette)
+
+            self.input_name.setFocus()  # put cursor back in the field
+            return  # stop saving
+        elif name_exist is None:
+            self.accept()
+
+        # ✅ If OK, reset palette back to normal
+        self.input_name.setPalette(QApplication.palette())
+
         supplier_data = {
             'supplier_id': self.supplier_data.get('supplier_id'),
             'supplier_name': self.input_name.text(),
@@ -97,10 +187,8 @@ class SupplierFormDialog(FormDialog):
         }
 
         edit_supplier(self.conn, supplier_data)
+        self.supplier_edited.emit(supplier_data)
+        self.accept()
 
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = SupplierFormDialog()
-#     window.show()   # now works
-#     sys.exit(app.exec())
+    def reset_name_highlight(self):
+        self.input_name.setPalette(QApplication.palette())
