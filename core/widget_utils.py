@@ -1,6 +1,11 @@
+# 1. Standard Library
+
+# 2. Third Party Library
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QColor, QPalette, QTextCursor
 from PySide6.QtWidgets import QApplication, QPushButton
+
+# 3. Internal Library
 
 
 def update_refresh_btn(refresh_btn: QPushButton, success: bool):
@@ -11,13 +16,13 @@ def update_refresh_btn(refresh_btn: QPushButton, success: bool):
         refresh_btn.setText('❌ Failed')
         refresh_btn.setStyleSheet('color: red;')
 
-    # Resets refresh button after 2 seconds
-    QTimer.singleShot(2000, lambda: reset_refresh_btn(refresh_btn))
+    # Nested reset function
+    def reset_refresh_btn():
+        refresh_btn.setText('🔄 Refresh')
+        refresh_btn.setStyleSheet('')
 
-
-def reset_refresh_btn(refresh_btn: QPushButton):
-    refresh_btn.setText('🔄 Refresh')
-    refresh_btn.setStyleSheet('')
+    # Call reset after 2 seconds
+    QTimer.singleShot(2000, reset_refresh_btn)
 
 
 def update_counter(widget, max_chars: int):
