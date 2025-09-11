@@ -7,6 +7,17 @@ from PySide6.QtWidgets import (
 from database.clientdb.client_form_dialog import ClientFormDialog
 from database.clientdb.client_database import remove_client
 from database.database_functions import filter_table
+from database.widget_functions import setup_table_ui, update_table_row, add_table_row
+
+# Define the column order matching your QTableWidget
+COLUMN_ORDER = [
+    'client_id',
+    'client_name',
+    'client_contact',
+    'client_type',
+    'status',
+    'description'
+]
 
 
 class ClientPage(QWidget):
@@ -73,7 +84,6 @@ class ClientPage(QWidget):
         ])
         # Automatically resize certain columns to fit contents
         header = self.table.horizontalHeader()
-        self.table.setColumnHidden(0, True)  # Hide the client ID
         header.setSectionResizeMode(
             1, QHeaderView.ResizeMode.ResizeToContents
         )  # client Name
@@ -86,17 +96,10 @@ class ClientPage(QWidget):
         header.setSectionResizeMode(
             4, QHeaderView.ResizeMode.ResizeToContents
         )  # Status
-
-        # Optional: make one column stretch to fill remaining space
         header.setSectionResizeMode(
             5, QHeaderView.ResizeMode.Stretch
         )  # Desc can be stretched
-
-        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
-        self.table.cellDoubleClicked.connect(self.edit_client)
-        header.setSectionsMovable(True)
+        setup_table_ui(self.table, self.edit_client)
 
     # Load Data
     def load_data(self):
@@ -130,9 +133,9 @@ class ClientPage(QWidget):
     # Add Client
     def add_client(self):
         dialog = ClientFormDialog(self, 'add', conn=self.conn)
-        # dialog.client_added.connect(
-        # lambda data: self.update_client_in_table(row, data)
-        # )
+        dialog.client_added.connect(
+            lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
+        )
         dialog.exec()
 
     # Edit Client
@@ -150,7 +153,7 @@ class ClientPage(QWidget):
             parent=self, mode='edit', client_data=client_data, conn=self.conn
         )
         dialog.client_edited.connect(
-            lambda data: self.update_client_in_table(row, data)
+            lambda data: update_table_row(self.table, row, [data[key] for key in COLUMN_ORDER])
         )
         dialog.exec()
 
@@ -177,16 +180,3 @@ class ClientPage(QWidget):
         if confirm == QMessageBox.StandardButton.Yes:
             remove_client(self.conn, client_id, client_name)
             self.table.removeRow(row)
-
-    def update_client_in_table(self, row, client_data):
-        updated_row = [
-            str(client_data['client_id']),
-            client_data['client_name'],
-            client_data['client_contact'],
-            client_data['client_type'],
-            client_data['status'],
-            client_data['description']
-        ]
-        self.data[row] = updated_row
-        for col_idx, value in enumerate(updated_row):
-            self.table.setItem(row, col_idx, QTableWidgetItem(value))

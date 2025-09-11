@@ -8,6 +8,15 @@ from PySide6.QtWidgets import (
 from database.database_functions import filter_table
 from database.partnerdb.partner_form_dialog import PartnerFormDialog
 from database.partnerdb.partner_database import remove_partner
+from database.widget_functions import setup_table_ui, update_table_row, add_table_row
+
+# Define the column order matching your QTableWidget
+COLUMN_ORDER = [
+    'partner_id',
+    'partner_name',
+    'partner_contact',
+    'description'
+]
 
 
 class PartnerPage(QWidget):
@@ -72,25 +81,16 @@ class PartnerPage(QWidget):
         ])
         # Automatically resize certain columns to fit contents
         header = self.table.horizontalHeader()
-        self.table.setColumnHidden(0, True)  # Hide the partner ID
         header.setSectionResizeMode(
             1, QHeaderView.ResizeMode.ResizeToContents
         )  # partner Name
         header.setSectionResizeMode(
             2, QHeaderView.ResizeMode.ResizeToContents
         )  # Contact
-
-        # Optional: make one column stretch to fill remaining space
         header.setSectionResizeMode(
             3, QHeaderView.ResizeMode.Stretch
         )  # Desc can be stretched
-
-        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
-        self.table.cellDoubleClicked.connect(self.edit_partner)
-        header.setSectionsMovable(True)
-        # TODO: Set when double click, a partner form dialog for editing appears
+        setup_table_ui(self.table, self.edit_partner)
 
     # Load Data
     def load_data(self):
@@ -122,9 +122,9 @@ class PartnerPage(QWidget):
     # Add partner
     def add_partner(self):
         dialog = PartnerFormDialog(self, 'add', conn=self.conn)
-        # dialog.partner_added.connect(
-        # lambda data: self.update_partner_in_table(row, data)
-        # )
+        dialog.partner_added.connect(
+            lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
+        )
         dialog.exec()
 
     # Edit partner
@@ -140,7 +140,7 @@ class PartnerPage(QWidget):
             parent=self, mode='edit', partner_data=partner_data, conn=self.conn
         )
         dialog.partner_edited.connect(
-            lambda data: self.update_partner_in_table(row, data)
+            lambda data: update_table_row(self.table, row, [data[key] for key in COLUMN_ORDER])
         )
         dialog.exec()
 
@@ -166,14 +166,3 @@ class PartnerPage(QWidget):
         if confirm == QMessageBox.StandardButton.Yes:
             remove_partner(self.conn, partner_id, partner_name)
             self.table.removeRow(row)
-
-    def update_partner_in_table(self, row, partner_data):
-        updated_row = [
-            str(partner_data['partner_id']),
-            partner_data['partner_name'],
-            partner_data['partner_contact'],
-            partner_data['description']
-        ]
-        self.data[row] = updated_row
-        for col_idx, value in enumerate(updated_row):
-            self.table.setItem(row, col_idx, QTableWidgetItem(value))

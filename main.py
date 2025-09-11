@@ -24,6 +24,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('CRMMaster')
         self.resize(1200, 600)
 
+        self.currency_window = None
+
         # This will be the main connection for any query to the SQL database
         self.conn = get_connection()
 

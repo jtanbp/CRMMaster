@@ -8,6 +8,18 @@ from PySide6.QtWidgets import (
 from database.database_functions import filter_table
 from database.supplierdb.supplier_form_dialog import SupplierFormDialog
 from database.supplierdb.supplier_database import remove_supplier
+from database.widget_functions import setup_table_ui, update_table_row, add_table_row
+
+
+# Define the column order matching your QTableWidget
+COLUMN_ORDER = [
+    'supplier_id',
+    'supplier_name',
+    'supplier_contact',
+    'supplier_type',
+    'status',
+    'description'
+]
 
 
 class SupplierPage(QWidget):
@@ -74,7 +86,6 @@ class SupplierPage(QWidget):
         ])
         # Automatically resize certain columns to fit contents
         header = self.table.horizontalHeader()
-        self.table.setColumnHidden(0, True)  # Hide the Supplier ID
         header.setSectionResizeMode(
             1, QHeaderView.ResizeMode.ResizeToContents
         )  # Supplier Name
@@ -87,17 +98,10 @@ class SupplierPage(QWidget):
         header.setSectionResizeMode(
             4, QHeaderView.ResizeMode.ResizeToContents
         )  # Status
-
-        # Stretch Desc
         header.setSectionResizeMode(
             5, QHeaderView.ResizeMode.Stretch
-        )
-
-        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
-        self.table.cellDoubleClicked.connect(self.edit_supplier)
-        header.setSectionsMovable(True)
+        )  # Stretch Desc
+        setup_table_ui(self.table, self.edit_supplier)
 
     # Load Data
     def load_data(self):
@@ -134,9 +138,9 @@ class SupplierPage(QWidget):
     # Add Supplier
     def add_supplier(self):
         dialog = SupplierFormDialog(self, 'add', conn=self.conn)
-        # dialog.supplier_edited.connect(
-        # lambda data: self.update_supplier_in_table(row, data)
-        # )
+        dialog.supplier_added.connect(
+            lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
+        )
         dialog.exec()
 
     # Edit Supplier
@@ -156,7 +160,7 @@ class SupplierPage(QWidget):
             supplier_data=supplier_data,
             conn=self.conn)
         dialog.supplier_edited.connect(
-            lambda data: self.update_supplier_in_table(row, data)
+            lambda data: update_table_row(self.table, row, [data[key] for key in COLUMN_ORDER])
         )
         dialog.exec()
 
@@ -182,15 +186,15 @@ class SupplierPage(QWidget):
             remove_supplier(self.conn, supplier_id, supplier_name)
             self.table.removeRow(row)
 
-    def update_supplier_in_table(self, row, supplier_data):
-        updated_row = [
-            str(supplier_data['supplier_id']),
-            supplier_data['supplier_name'],
-            supplier_data['supplier_contact'],
-            supplier_data['supplier_type'],
-            supplier_data['status'],
-            supplier_data['description']
-        ]
-        self.data[row] = updated_row
-        for col_idx, value in enumerate(updated_row):
-            self.table.setItem(row, col_idx, QTableWidgetItem(value))
+    # def update_supplier_in_table(self, row, supplier_data):
+    #     updated_row = [
+    #         str(supplier_data['supplier_id']),
+    #         supplier_data['supplier_name'],
+    #         supplier_data['supplier_contact'],
+    #         supplier_data['supplier_type'],
+    #         supplier_data['status'],
+    #         supplier_data['description']
+    #     ]
+    #     self.data[row] = updated_row
+    #     for col_idx, value in enumerate(updated_row):
+    #         self.table.setItem(row, col_idx, QTableWidgetItem(value))
