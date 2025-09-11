@@ -1,8 +1,17 @@
+# 1. Standard Library
+
+# 2. Third Party Library
 import requests
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QLineEdit, QTableWidget, QTableWidgetItem
-)
 from PySide6.QtCore import QThread, Signal
+from PySide6.QtWidgets import (
+    QLineEdit,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
+# 3. Internal Library
 
 
 # Thread to fetch rates

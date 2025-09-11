@@ -1,5 +1,15 @@
-from PySide6.QtWidgets import (QDialog, QVBoxLayout, QSizePolicy,
-                               QHBoxLayout, QPushButton)
+# 1. Standard Library
+
+# 2. Third Party Library
+from PySide6.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QPushButton,
+    QSizePolicy,
+    QVBoxLayout,
+)
+
+# 3. Internal Library
 
 
 class FormDialog(QDialog):

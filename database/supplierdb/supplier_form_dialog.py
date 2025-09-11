@@ -1,11 +1,22 @@
+# 1. Standard Library
+
+# 2. Third Party Library
 from PySide6.QtCore import Signal
-from PySide6.QtGui import QPalette, QColor
-from PySide6.QtWidgets import (QVBoxLayout, QComboBox, QLineEdit,
-                               QTextEdit, QLabel, QHBoxLayout,
-                               QMessageBox, QApplication)
-from core.form_dialog import FormDialog
-from database.supplierdb.supplier_database import (
-    insert_supplier, edit_supplier, supplier_name_exists)
+from PySide6.QtGui import QColor, QPalette
+from PySide6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QTextEdit,
+    QVBoxLayout,
+)
+
+# 3. Internal Library
+from core import FormDialog
+from database.supplierdb import edit_supplier, insert_supplier, supplier_name_exists
 
 
 class SupplierFormDialog(FormDialog):

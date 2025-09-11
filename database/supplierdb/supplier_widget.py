@@ -1,15 +1,29 @@
+# 1. Standard Library
+
+# 2. Third Party Library
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
-    QTableWidgetItem, QLabel, QPushButton, QMessageBox,
-    QHeaderView, QLineEdit, QComboBox
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
 
-from database.database_functions import filter_table
-from database.supplierdb.supplier_form_dialog import SupplierFormDialog
-from database.supplierdb.supplier_database import remove_supplier
-from database.widget_functions import setup_table_ui, update_table_row, add_table_row
-
+# 3. Internal Library
+from database.supplierdb import SupplierFormDialog, remove_supplier
+from database.table_utils import (
+    add_table_row,
+    filter_table,
+    setup_table_ui,
+    update_table_row,
+)
 
 # Define the column order matching your QTableWidget
 COLUMN_ORDER = [
@@ -187,16 +201,3 @@ class SupplierPage(QWidget):
         if confirm == QMessageBox.StandardButton.Yes:
             remove_supplier(self.conn, supplier_id, supplier_name)
             self.table.removeRow(row)
-
-    # def update_supplier_in_table(self, row, supplier_data):
-    #     updated_row = [
-    #         str(supplier_data['supplier_id']),
-    #         supplier_data['supplier_name'],
-    #         supplier_data['supplier_contact'],
-    #         supplier_data['supplier_type'],
-    #         supplier_data['status'],
-    #         supplier_data['description']
-    #     ]
-    #     self.data[row] = updated_row
-    #     for col_idx, value in enumerate(updated_row):
-    #         self.table.setItem(row, col_idx, QTableWidgetItem(value))

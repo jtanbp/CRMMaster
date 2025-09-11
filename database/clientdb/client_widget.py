@@ -1,13 +1,29 @@
+# 1. Standard Library
+
+# 2. Third Party Library
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
-    QTableWidgetItem, QLabel, QPushButton, QMessageBox,
-    QHeaderView, QComboBox, QLineEdit
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
-from database.clientdb.client_form_dialog import ClientFormDialog
-from database.clientdb.client_database import remove_client
-from database.database_functions import filter_table
-from database.widget_functions import setup_table_ui, update_table_row, add_table_row
+
+# 3. Internal Library
+from database.clientdb import ClientFormDialog, remove_client
+from database.table_utils import (
+    add_table_row,
+    filter_table,
+    setup_table_ui,
+    update_table_row,
+)
 
 # Define the column order matching your QTableWidget
 COLUMN_ORDER = [

@@ -1,4 +1,9 @@
+# 1. Standard Library
+
+# 2. Third Party Library
 from PySide6.QtWidgets import QMessageBox
+
+# 3. Internal Library
 
 
 def insert_supplier(conn, supplier_name, supplier_contact,
