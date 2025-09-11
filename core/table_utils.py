@@ -26,19 +26,14 @@ def setup_table_ui(table: QTableWidget, edit_callback):
 
 def filter_table(widget, text):
     text = text.strip().lower()
-    widget.table.setRowCount(0)
-
-    # Which column to filter on (based on combo box selection)
-    # +1 is because first column is id(PK) which is hidden
     filter_col = widget.filter_box.currentIndex() + 1
 
-    for row_data in widget.data:
-        value = str(row_data[filter_col]).lower()
-        if text in value:
-            row_idx = widget.table.rowCount()
-            widget.table.insertRow(row_idx)
-            for col_idx, col_value in enumerate(row_data):
-                widget.table.setItem(row_idx, col_idx, QTableWidgetItem(str(col_value)))
+    for row in range(widget.table.rowCount()):
+        item = widget.table.item(row, filter_col)
+        if item and text in item.text().lower():
+            widget.table.setRowHidden(row, False)
+        else:
+            widget.table.setRowHidden(row, True if text else False)
 
 
 def update_table_row(table: QTableWidget, row: int, data: list):
@@ -78,7 +73,6 @@ def reset_table_order(table: QTableWidget):
 
     Args:
         table (QTableWidget): The table to reset.
-        original_data (list): List of row tuples/lists representing the default order.
     """
     table.setSortingEnabled(True)  # make sure sorting is allowed
     table.sortItems(0, Qt.AscendingOrder)  # sort by first column (ID)
