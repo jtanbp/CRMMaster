@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
+from core import update_refresh_btn
 from database.partnerdb import PartnerFormDialog, remove_partner
 from database.table_utils import (
     add_table_row,
@@ -41,6 +42,7 @@ class PartnerPage(QWidget):
     def __init__(self, parent=None, conn=None):
         super().__init__(parent)
 
+        self.refresh_btn = QPushButton('🔄 Refresh')  # Pushbutton Refresh Notification
         self.table = QTableWidget()  # Stores data
         self.filter_box = QComboBox()  # For reference when doing searches
         self.data = {}  # Store data for filtering
@@ -55,10 +57,8 @@ class PartnerPage(QWidget):
         header_layout.addWidget(QLabel('📦Partner List'))
 
         # Refresh Button
-        refresh_btn = QPushButton('🔄 Refresh')
-        refresh_btn.clicked.connect(self.load_data)
-        header_layout.addWidget(refresh_btn)
-        # TODO: Add a status bar at the bottom to give notif
+        self.refresh_btn.clicked.connect(self.load_data)
+        header_layout.addWidget(self.refresh_btn)
 
         # Add Button
         add_btn = QPushButton('➕')
@@ -129,7 +129,9 @@ class PartnerPage(QWidget):
             for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+            update_refresh_btn(self.refresh_btn, True)
         except Exception as e:
+            update_refresh_btn(self.refresh_btn, False)
             QMessageBox.critical(self,
                                  'DB Error',
                                  f"⚠️ Failed to fetch partners:\n{e}")

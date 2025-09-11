@@ -37,10 +37,3 @@ class FormDialog(QDialog):
         # Standard button wiring
         self.btn_add.clicked.connect(self.accept)  # close with Accepted
         self.btn_cancel.clicked.connect(self.reject)
-
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = FormDialog()
-#     window.show()   # now works
-#     sys.exit(app.exec())

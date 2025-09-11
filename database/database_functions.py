@@ -15,11 +15,11 @@ def get_connection():
         # DATABASE_URL = os.getenv('DATABASE_URL')
         # conn = psycopg2.connect(DATABASE_URL)
         conn = psycopg2.connect(
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT"),
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASS"),
+            host=os.getenv('DB_HOST'),
+            port=os.getenv('DB_PORT'),
+            dbname=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASS'),
         )
         return conn
     except Exception as e:

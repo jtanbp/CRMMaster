@@ -5,8 +5,8 @@ from database.supplierdb.supplier_widget import SupplierPage
 
 # Explicitly define what this package exports
 __all__ = [
-    "ClientPage",
-    "get_connection",
-    "PartnerPage",
-    "SupplierPage",
+    'ClientPage',
+    'get_connection',
+    'PartnerPage',
+    'SupplierPage',
 ]
