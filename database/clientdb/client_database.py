@@ -61,7 +61,7 @@ def remove_client(conn, client_id, client_name):
                         WHERE client_id = %s
                         """, (client_id,))
         conn.commit()
-        QMessageBox.information(None, 'Deleted', f"❌ client '{client_name}' removed")
+        QMessageBox.information(None, 'Deleted', f"❌ Client '{client_name}' removed")
     except Exception as e:
         conn.rollback()
         QMessageBox.critical(None, 'DB Error', f'⚠️ Failed to delete client:\n{e}')
@@ -97,7 +97,7 @@ def edit_client(conn, client_data: dict):
         QMessageBox.information(
             None,
             'Edited',
-            f"🔄 client '{client_name}' edited")
+            f"🔄 Client '{client_name}' edited")
     except Exception as e:
         conn.rollback()
         QMessageBox.critical(

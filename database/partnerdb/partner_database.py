@@ -60,7 +60,7 @@ def remove_partner(conn, partner_id, partner_name):
         conn.commit()
         QMessageBox.information(None,
                                 'Deleted',
-                                f"❌ partner '{partner_name}' removed")
+                                f"❌ Partner '{partner_name}' removed")
     except Exception as e:
         conn.rollback()
         QMessageBox.critical(None,
@@ -93,7 +93,7 @@ def edit_partner(conn, partner_data: dict):
         conn.commit()
         QMessageBox.information(None,
                                 'Edited',
-                                f"🔄 partner '{partner_name}' edited")
+                                f"🔄 Partner '{partner_name}' edited")
     except Exception as e:
         conn.rollback()
         QMessageBox.critical(None,

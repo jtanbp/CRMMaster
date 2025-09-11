@@ -1,6 +1,7 @@
 # 1. Standard Library
 
 # 2. Third Party Library
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
 # 3. Internal Library
@@ -14,6 +15,13 @@ def setup_table_ui(table: QTableWidget, edit_callback):
     table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
     table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
     table.cellDoubleClicked.connect(edit_callback)
+
+    # Enable sorting on the table
+    table.setSortingEnabled(True)
+
+    # Optional: start with no sort
+    table.horizontalHeader().setSortIndicatorShown(True)
+    table.horizontalHeader().setSortIndicator(-1, Qt.SortOrder.AscendingOrder)
 
 
 def filter_table(widget, text):
@@ -62,3 +70,15 @@ def add_table_row(table: QTableWidget, data: list):
     # Fill the row
     for col_idx, value in enumerate(data):
         table.setItem(new_row_index, col_idx, QTableWidgetItem(str(value)))
+
+
+def reset_table_order(table: QTableWidget):
+    """
+    Resets the QTableWidget to the original order.
+
+    Args:
+        table (QTableWidget): The table to reset.
+        original_data (list): List of row tuples/lists representing the default order.
+    """
+    table.setSortingEnabled(True)  # make sure sorting is allowed
+    table.sortItems(0, Qt.AscendingOrder)  # sort by first column (ID)

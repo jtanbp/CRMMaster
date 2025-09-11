@@ -17,14 +17,15 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
-from core import update_refresh_btn
-from database.supplierdb import SupplierFormDialog, remove_supplier
-from database.table_utils import (
+from core import (
     add_table_row,
     filter_table,
+    reset_table_order,
     setup_table_ui,
+    update_refresh_btn,
     update_table_row,
 )
+from database.supplierdb import SupplierFormDialog, remove_supplier
 
 # Define the column order matching your QTableWidget
 COLUMN_ORDER = [
@@ -61,6 +62,13 @@ class SupplierPage(QWidget):
         # Refresh Button
         self.refresh_btn.clicked.connect(self.load_data)
         header_layout.addWidget(self.refresh_btn)
+
+        # Reset Table Button
+        reset_btn = QPushButton('🔁 Reset Order')
+        reset_btn.clicked.connect(
+            lambda: reset_table_order(self.table)
+        )
+        header_layout.addWidget(reset_btn)
 
         # Add Button
         add_btn = QPushButton('➕')
@@ -139,10 +147,17 @@ class SupplierPage(QWidget):
                     "ORDER BY supplier_id;")
                 self.data = cur.fetchall()
 
+            # Disable sorting to safely reload rows
+            self.table.setSortingEnabled(False)
+
             self.table.setRowCount(len(self.data))
             for row_idx, row_data in enumerate(self.data):
                 for col_idx, value in enumerate(row_data):
                     self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+
+            # Re-enable sorting after reload
+            self.table.setSortingEnabled(True)
+
             update_refresh_btn(self.refresh_btn, True)
         except Exception as e:
             update_refresh_btn(self.refresh_btn, False)
