@@ -73,6 +73,9 @@ class SupplierPage(QWidget):
         header_layout.addWidget(QLabel('📦Supplier List'))
 
         # Refresh Button
+        self.refresh_btn.clicked.connect(
+            lambda: reset_table_order(self.table)
+        )
         self.refresh_btn.clicked.connect(self.load_data)
         header_layout.addWidget(self.refresh_btn)
 

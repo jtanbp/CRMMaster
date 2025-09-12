@@ -98,6 +98,7 @@ def reset_table_order(table: QTableWidget):
     Args:
         table (QTableWidget): The table to reset.
     """
+    # TODO: The sorting right now is not quite right, it sorts based on first digit
     table.setSortingEnabled(True)  # make sure sorting is allowed
     table.sortItems(0, Qt.SortOrder.AscendingOrder)  # sort by first column (ID)
 

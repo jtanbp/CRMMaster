@@ -211,12 +211,26 @@ class SupplierFormDialog(FormDialog):
                 name_exist):
             return
 
+        # Handle dates (optional)
+        contract_start = (
+            self.input_start_date.date().toString("yyyy-MM-dd")
+            if self.start_checkbox.isChecked()
+            else None
+        )
+        contract_end = (
+            self.input_end_date.date().toString("yyyy-MM-dd")
+            if self.end_checkbox.isChecked()
+            else None
+        )
+
         data = {
             'supplier_name': name,
             'supplier_contact': contact,
             'supplier_type': supplier_type,
             'status': status,
             'description': description,
+            'contract_start': contract_start,
+            'contract_end': contract_end,
         }
         supplier_data = insert_entity(
             self.conn,
@@ -254,13 +268,27 @@ class SupplierFormDialog(FormDialog):
         # ✅ If OK, reset palette back to normal
         self.input_name.setPalette(QApplication.palette())
 
+        # Handle dates (optional)
+        contract_start = (
+            self.input_start_date.date().toString("yyyy-MM-dd")
+            if self.start_checkbox.isChecked()
+            else None
+        )
+        contract_end = (
+            self.input_end_date.date().toString("yyyy-MM-dd")
+            if self.end_checkbox.isChecked()
+            else None
+        )
+
         supplier_data = {
-            'supplier_id': self.supplier_data.get('supplier_id'),
+            'supplier_id': supplier_id,
             'supplier_name': self.input_name.text(),
             'supplier_contact': self.input_contact.text(),
             'supplier_type': self.input_type.currentText(),
             'status': self.input_status.currentText(),
-            'description': self.input_desc.toPlainText()
+            'description': self.input_desc.toPlainText(),
+            'contract_start': contract_start,
+            'contract_end': contract_end,
         }
 
         edit_entity(self.conn, 'supplier', 'supplier_id', supplier_data, 'Supplier')
