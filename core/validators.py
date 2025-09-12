@@ -16,7 +16,7 @@ def validate_required(
         QMessageBox.warning(
             parent,
             'Validation Error',
-            f"{field_name} cannot be empty.")
+            f'{field_name} cannot be empty.')
         return False
     return True
 
@@ -31,7 +31,7 @@ def validate_max_length(
         QMessageBox.warning(
             parent,
             'Validation Error',
-            f"{field_name} exceeds maximum length of {max_length}.")
+            f'{field_name} exceeds maximum length of {max_length}.')
         return False
     return True
 
@@ -46,7 +46,7 @@ def validate_characters(
         QMessageBox.warning(
             parent,
             'Validation Error',
-            f"{field_name} contains invalid characters.")
+            f'{field_name} contains invalid characters.')
         return False
     return True
 
@@ -61,6 +61,6 @@ def validate_selection(
         QMessageBox.warning(
             parent,
             'Validation Error',
-            f"{field_name} selection is invalid.")
+            f'{field_name} selection is invalid.')
         return False
     return True

@@ -20,16 +20,16 @@ class FetchRatesThread(QThread):
 
     def run(self):
         try:
-            url = "https://open.er-api.com/v6/latest/USD"
+            url = 'https://open.er-api.com/v6/latest/USD'
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             data = response.json()
 
-            if data.get("result") != "success":
+            if data.get('result') != 'success':
                 self.finished.emit({})
                 return
 
-            rates = data.get("rates", {})
+            rates = data.get('rates', {})
             self.finished.emit(rates)
         except Exception:
             self.finished.emit({})
@@ -86,7 +86,7 @@ class CurrencyWindow(QWidget):
         for row, (currency, rate) in enumerate(final_list):
             self.table.insertRow(row)
             self.table.setItem(row, 0, QTableWidgetItem(currency))
-            self.table.setItem(row, 1, QTableWidgetItem(f"{rate:.4f}"))
+            self.table.setItem(row, 1, QTableWidgetItem(f'{rate:.4f}'))
 
     def filter_table(self, text):
         text = text.upper()
@@ -97,4 +97,4 @@ class CurrencyWindow(QWidget):
                 self.table.setItem(
                     self.table.rowCount()-1, 0, QTableWidgetItem(currency))
                 self.table.setItem(
-                    self.table.rowCount()-1, 1, QTableWidgetItem(f"{rate:.4f}"))
+                    self.table.rowCount()-1, 1, QTableWidgetItem(f'{rate:.4f}'))

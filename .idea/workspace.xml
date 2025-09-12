@@ -4,24 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Fix bug regarding filter table with sorting">
-      <change afterPath="$PROJECT_DIR$/core/dialogs/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/utils/db_utils.py" afterDir="false" />
+    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Cleaned up code to remove individual database classes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/currency_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dialogs/currency_dialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dialogs/form_dialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/table_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/table_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/widget_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/widget_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/clientdb/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/dialogs/currency_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dialogs/currency_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/dialogs/form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/dialogs/form_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils/widget_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/widget_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/validators.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/validators.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/clientdb/client_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/partnerdb/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/partnerdb/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/partnerdb/partner_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/partnerdb/partner_form_dialog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/partnerdb/partner_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/partnerdb/partner_widget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/supplierdb/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/supplierdb/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/supplierdb/supplier_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/supplierdb/supplier_database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/supplierdb/supplier_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/supplierdb/supplier_form_dialog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/supplierdb/supplier_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/supplierdb/supplier_widget.py" afterDir="false" />
     </list>
@@ -188,7 +181,7 @@
       <workItem from="1757173362594" duration="8716000" />
       <workItem from="1757497584650" duration="19597000" />
       <workItem from="1757554602733" duration="17784000" />
-      <workItem from="1757639723470" duration="12190000" />
+      <workItem from="1757639723470" duration="22363000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -358,7 +351,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757601112188</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Cleaned up code to remove individual database classes">
+      <option name="closed" value="true" />
+      <created>1757659224299</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1757659224299</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -408,13 +409,14 @@
     <MESSAGE value="linting and simplfying code" />
     <MESSAGE value="Added sorting by headers" />
     <MESSAGE value="Fix bug regarding filter table with sorting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix bug regarding filter table with sorting" />
+    <MESSAGE value="Cleaned up code to remove individual database classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up code to remove individual database classes" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CRMMaster$db.coverage" NAME="db Coverage Results" MODIFIED="1756977183530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$main.coverage" NAME="main Coverage Results" MODIFIED="1757513146682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CRMMaster$run_main.coverage" NAME="run_main Coverage Results" MODIFIED="1757658937069" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
-    <SUITE FILE_PATH="coverage/CRMMaster$flake8.coverage" NAME="flake8 Coverage Results" MODIFIED="1757653248588" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
+    <SUITE FILE_PATH="coverage/CRMMaster$run_main.coverage" NAME="run_main Coverage Results" MODIFIED="1757684424197" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
+    <SUITE FILE_PATH="coverage/CRMMaster$flake8.coverage" NAME="flake8 Coverage Results" MODIFIED="1757684687481" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
     <SUITE FILE_PATH="coverage/CRMMaster$testfile.coverage" NAME="testfile Coverage Results" MODIFIED="1757129431091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$test_database.coverage" NAME="test_database Coverage Results" MODIFIED="1757054197595" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$supplier_form_widget.coverage" NAME="supplier_form_widget Coverage Results" MODIFIED="1757060899387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/supplierdb" />

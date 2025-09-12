@@ -1,9 +1,12 @@
 # 1. Standard Library
 
 # 2. Third Party Library
+from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
+    QApplication,
     QDialog,
     QHBoxLayout,
+    QMessageBox,
     QPushButton,
     QSizePolicy,
     QVBoxLayout,
@@ -15,7 +18,7 @@ from PySide6.QtWidgets import (
 class FormDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Form Dialog")
+        self.setWindowTitle('Form Dialog')
 
         self.main_layout = QVBoxLayout(self)
         self.btn_add = QPushButton('Accept')
@@ -37,3 +40,33 @@ class FormDialog(QDialog):
         # Standard button wiring
         self.btn_add.clicked.connect(self.accept)  # close with Accepted
         self.btn_cancel.clicked.connect(self.reject)
+
+    def handle_duplicate_name(self, input_widget, entity_label, name, name_exists):
+        """
+        Reusable duplicate-name handler.
+
+        Returns True if the name is valid (no duplicate),
+        False if duplicate found or error occurred.
+        """
+        if name_exists:
+            QMessageBox.warning(
+                self,
+                'Duplicate Name',
+                f'A {entity_label.lower()} with the name "{name}" already exists.'
+            )
+            # highlight in red
+            palette = input_widget.palette()
+            palette.setColor(QPalette.ColorRole.Base, QColor('#ffcccc'))
+            palette.setColor(QPalette.ColorRole.Text, QColor('black'))
+            input_widget.setPalette(palette)
+
+            input_widget.setFocus()
+            return False
+
+        elif name_exists is None:  # DB error or query failed
+            self.accept()
+            return False
+
+        # Reset palette back to normal
+        input_widget.setPalette(QApplication.palette())
+        return True

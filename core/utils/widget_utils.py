@@ -46,7 +46,7 @@ def update_counter(widget, max_chars: int):
         remaining = 0
 
     # Update counter label
-    widget.counter_label.setText(f"{remaining} characters remaining")
+    widget.counter_label.setText(f'{remaining} characters remaining')
 
     # Reset palette from the system default
     palette = widget.counter_label.palette()
@@ -55,6 +55,6 @@ def update_counter(widget, max_chars: int):
     # Set red if limit reached, else default system color
     palette.setColor(
         QPalette.ColorRole.WindowText,
-        QColor("red") if remaining == 0 else default_color
+        QColor('red') if remaining == 0 else default_color
     )
     widget.counter_label.setPalette(palette)

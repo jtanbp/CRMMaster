@@ -2,13 +2,11 @@
 
 # 2. Third Party Library
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QMessageBox,
     QTextEdit,
     QVBoxLayout,
 )
@@ -40,7 +38,7 @@ class PartnerFormDialog(FormDialog):
         self.input_contact = QLineEdit()
         self.input_desc = QTextEdit()
         self.max_chars = 500
-        self.counter_label = QLabel(f"{self.max_chars} characters remaining")
+        self.counter_label = QLabel(f'{self.max_chars} characters remaining')
         self.mode = mode
         self.conn = conn
         self.partner_data = partner_data
@@ -115,30 +113,13 @@ class PartnerFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exists = entity_name_exists(self.conn, 'partner', 'partner_name', name)
-        if name_exists:
-            QMessageBox.warning(
-                self,
-                'Duplicate Name',
-                f"A partner with the name '{name}' already exists."
-            )
-            # ✅ highlight the name field in red
-            palette = self.input_name.palette()
-            palette.setColor(
-                QPalette.ColorRole.Base, QColor('#ffcccc')
-            )  # light red background
-            palette.setColor(
-                QPalette.ColorRole.Text, QColor('black')
-            )  # text color
-            self.input_name.setPalette(palette)
-
-            self.input_name.setFocus()  # put cursor back in the field
-            return  # stop saving
-        elif name_exists is None:
-            self.accept()
-
-        # ✅ If OK, reset palette back to normal
-        self.input_name.setPalette(QApplication.palette())
+        name_exist = entity_name_exists(self.conn, 'partner', 'partner_name', name)
+        if not self.handle_duplicate_name(
+                self.input_name,
+                'Partner',
+                name,
+                name_exist):
+            return
 
         data = {
             'partner_name': name,
@@ -162,36 +143,19 @@ class PartnerFormDialog(FormDialog):
         partner_id = self.partner_data.get('partner_id')
 
         # 🔎 Check uniqueness
-        name_exists = entity_name_exists(
+        name_exist = entity_name_exists(
             self.conn,
             'partner',
             'partner_name',
             new_name,
             'partner_id',
             exclude_id=partner_id)
-        if name_exists:
-            QMessageBox.warning(
-                self,
-                'Duplicate Name',
-                f"A partner with the name '{new_name}' already exists."
-            )
-            # ✅ highlight the name field in red
-            palette = self.input_name.palette()
-            palette.setColor(
-                QPalette.ColorRole.Base, QColor('#ffcccc')
-            )  # light red background
-            palette.setColor(
-                QPalette.ColorRole.Text, QColor('black')
-            )  # text color
-            self.input_name.setPalette(palette)
-
-            self.input_name.setFocus()  # put cursor back in the field
-            return  # stop saving
-        elif name_exists is None:
-            self.accept()
-
-        # ✅ If OK, reset palette back to normal
-        self.input_name.setPalette(QApplication.palette())
+        if not self.handle_duplicate_name(
+                self.input_name,
+                'Partner',
+                new_name,
+                name_exist):
+            return
 
         partner_data = {
             'partner_id': self.partner_data.get('partner_id'),
@@ -225,7 +189,7 @@ class PartnerFormDialog(FormDialog):
                     self) and
                 validate_characters(
                     name,
-                    r"[A-Za-z0-9\s]+",
+                    r'[A-Za-z0-9\s]+',
                     'Partner Name',
                     self)):
             self.input_name.setFocus()
@@ -240,7 +204,7 @@ class PartnerFormDialog(FormDialog):
                     self) and
                     validate_characters(
                         contact,
-                        r"[A-Za-z0-9\s\+\-\(\)]*",
+                        r'[A-Za-z0-9\s\+\-\(\)]*',
                         'Partner Contact',
                         self)):
                 self.input_contact.setFocus()

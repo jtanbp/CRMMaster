@@ -1,11 +1,12 @@
 # 1. Standard Library
 
 # 2. Third Party Library
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QPalette
+from PySide6.QtCore import QDate, Qt, Signal
 from PySide6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QComboBox,
+    QDateEdit,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -46,8 +47,12 @@ class SupplierFormDialog(FormDialog):
         self.input_type = QComboBox()
         self.input_status = QComboBox()
         self.input_desc = QTextEdit()
+        self.input_start_date = QDateEdit()
+        self.input_end_date = QDateEdit()
+        self.start_checkbox = QCheckBox()
+        self.end_checkbox = QCheckBox()
         self.max_chars = 500
-        self.counter_label = QLabel(f"{self.max_chars} characters remaining")
+        self.counter_label = QLabel(f'{self.max_chars} characters remaining')
         self.mode = mode
         self.conn = conn
         self.supplier_data = supplier_data
@@ -60,6 +65,18 @@ class SupplierFormDialog(FormDialog):
     def setup(self):
         self.input_type.addItems(supplier_types)
         self.input_status.addItems(supplier_status)
+
+        # Contract Start Date
+        self.input_start_date.setCalendarPopup(True)
+        self.input_start_date.setDisplayFormat('yyyy-MM-dd')
+        self.input_start_date.setDate(QDate.currentDate())  # empty date
+        self.input_start_date.setEnabled(False)
+
+        # Contract End Date
+        self.input_end_date.setCalendarPopup(True)
+        self.input_end_date.setDisplayFormat('yyyy-MM-dd')
+        self.input_end_date.setDate(QDate.currentDate())
+        self.input_end_date.setEnabled(False)
 
         try:
             self.btn_add.clicked.disconnect(self.accept)
@@ -78,6 +95,13 @@ class SupplierFormDialog(FormDialog):
         self.input_name.textChanged.connect(self.reset_name_highlight)
         self.input_desc.textChanged.connect(
             lambda: update_counter(self, self.max_chars)
+        )
+        # Connect checkbox to enable/disable the date field
+        self.start_checkbox.stateChanged.connect(
+            lambda state: self.input_start_date.setEnabled(state == 2)  # 2 = checked
+        )
+        self.end_checkbox.stateChanged.connect(
+            lambda state: self.input_end_date.setEnabled(state == 2)
         )
 
     def setup_ui(self):
@@ -106,6 +130,22 @@ class SupplierFormDialog(FormDialog):
         input_counter_layout.addWidget(self.counter_label,
                                        alignment=Qt.AlignmentFlag.AlignRight)
 
+        contract_dates_layout = QHBoxLayout()
+
+        start_layout = QHBoxLayout()
+        start_layout.addWidget(QLabel('Start Date:'))
+        start_layout.addWidget(self.start_checkbox)
+        start_layout.addWidget(self.input_start_date)
+
+        end_layout = QHBoxLayout()
+        end_layout.addWidget(QLabel('End Date:'))
+        end_layout.addWidget(self.end_checkbox)
+        end_layout.addWidget(self.input_end_date)
+
+        # Add both layouts to main horizontal layout with equal stretch
+        contract_dates_layout.addLayout(start_layout, 1)
+        contract_dates_layout.addLayout(end_layout, 1)
+
         if self.mode == 'edit':
             self.input_name.setText(self.supplier_data.get('supplier_name'))
             self.input_contact.setText(self.supplier_data.get('supplier_contact'))
@@ -113,12 +153,35 @@ class SupplierFormDialog(FormDialog):
             self.input_status.setCurrentText(self.supplier_data.get('status'))
             self.input_desc.setText(self.supplier_data.get('description'))
 
+            # Handle start date
+            contract_start = self.supplier_data.get('contract_start')
+            if contract_start and contract_start != 'None':
+                year, month, day = map(int, contract_start.split('-'))
+                self.input_start_date.setDate(QDate(year, month, day))
+                self.start_checkbox.setChecked(True)
+                self.input_start_date.setEnabled(True)
+            else:
+                self.start_checkbox.setChecked(False)
+                self.input_start_date.setEnabled(False)
+
+            # Handle end date
+            contract_end = self.supplier_data.get('contract_end')
+            if contract_end and contract_end != 'None':
+                year, month, day = map(int, contract_end.split('-'))
+                self.input_end_date.setDate(QDate(year, month, day))
+                self.end_checkbox.setChecked(True)
+                self.input_end_date.setEnabled(True)
+            else:
+                self.end_checkbox.setChecked(False)
+                self.input_end_date.setEnabled(False)
+
         self.fields_layout.addLayout(supplier_name_layout)
         self.fields_layout.addLayout(supplier_contact_layout)
         self.fields_layout.addLayout(supplier_type_layout)
         self.fields_layout.addLayout(supplier_status_layout)
         self.fields_layout.addLayout(supplier_desc_layout)
         self.fields_layout.addLayout(input_counter_layout)
+        self.fields_layout.addLayout(contract_dates_layout)
 
         btn_layout = QHBoxLayout()
         btn_layout.addWidget(self.btn_add)
@@ -139,31 +202,14 @@ class SupplierFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exists = entity_name_exists(self.conn, 'supplier', 'supplier_name', name)
+        name_exist = entity_name_exists(self.conn, 'supplier', 'supplier_name', name)
 
-        if name_exists:
-            QMessageBox.warning(
-                self,
-                'Duplicate Name',
-                f"A supplier with the name '{name}' already exists."
-            )
-            # ✅ highlight the name field in red
-            palette = self.input_name.palette()
-            palette.setColor(
-                QPalette.ColorRole.Base, QColor('#ffcccc')
-            )  # light red background
-            palette.setColor(
-                QPalette.ColorRole.Text, QColor('black')
-            )  # text color
-            self.input_name.setPalette(palette)
-
-            self.input_name.setFocus()  # put cursor back in the field
-            return  # stop saving
-        elif name_exists is None:
-            self.accept()
-
-        # ✅ If OK, reset palette back to normal
-        self.input_name.setPalette(QApplication.palette())
+        if not self.handle_duplicate_name(
+                self.input_name,
+                'Supplier',
+                name,
+                name_exist):
+            return
 
         data = {
             'supplier_name': name,
@@ -196,24 +242,12 @@ class SupplierFormDialog(FormDialog):
             new_name,
             'supplier_id',
             exclude_id=supplier_id)
-        if name_exist:
-            QMessageBox.warning(
-                self,
-                'Duplicate Name',
-                f"A supplier with the name '{new_name}' already exists."
-            )
-            # ✅ highlight the name field in red
-            palette = self.input_name.palette()
-            palette.setColor(
-                QPalette.ColorRole.Base, QColor('#ffcccc')
-            )  # light red background
-            palette.setColor(
-                QPalette.ColorRole.Text, QColor('black')
-            )  # text color
-            self.input_name.setPalette(palette)
-
-            self.input_name.setFocus()  # put cursor back in the field
-            return  # stop saving
+        if not self.handle_duplicate_name(
+                self.input_name,
+                'Supplier',
+                new_name,
+                name_exist):
+            return
         elif name_exist is None:
             self.accept()
 
@@ -256,7 +290,7 @@ class SupplierFormDialog(FormDialog):
                     self) and
                 validate_characters(
                     name,
-                    r"[A-Za-z0-9\s]+",
+                    r'[A-Za-z0-9\s]+',
                     'Supplier Name',
                     self)):
             self.input_name.setFocus()
@@ -271,7 +305,7 @@ class SupplierFormDialog(FormDialog):
                     self) and
                     validate_characters(
                         contact,
-                        r"[A-Za-z0-9\s\+\-\(\)]*",
+                        r'[A-Za-z0-9\s\+\-\(\)]*',
                         'Supplier Contact',
                         self)):
                 self.input_contact.setFocus()
@@ -299,5 +333,36 @@ class SupplierFormDialog(FormDialog):
                 not validate_max_length(description, 500, 'Description', self)):
             self.input_desc.setFocus()
             return False
+
+        # --- Validate contract dates (optional) ---
+        # Start date
+        if self.start_checkbox.isChecked():
+            if not self.input_start_date.date().isValid():
+                self.input_start_date.setFocus()
+                QMessageBox.warning(
+                    self,
+                    'Invalid Date',
+                    'Please enter a valid Start Date.')
+                return False
+
+        # End date
+        if self.end_checkbox.isChecked():
+            if not self.input_end_date.date().isValid():
+                self.input_end_date.setFocus()
+                QMessageBox.warning(
+                    self,
+                    'Invalid Date',
+                    'Please enter a valid End Date.')
+                return False
+
+        # Optional: ensure start <= end
+        if self.start_checkbox.isChecked() and self.end_checkbox.isChecked():
+            if self.input_start_date.date() > self.input_end_date.date():
+                self.input_start_date.setFocus()
+                QMessageBox.warning(
+                    self,
+                    'Invalid Dates',
+                    'Start Date cannot be after End Date.')
+                return False
 
         return True

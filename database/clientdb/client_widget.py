@@ -15,11 +15,10 @@ from PySide6.QtWidgets import (
 )
 
 # 3. Internal Library
-from core import (
+from core import load_data_from_db, remove_entity
+from core.utils.table_utils import (
     add_table_row,
     filter_table,
-    load_data_from_db,
-    remove_entity,
     reset_table_order,
     row_to_dict,
     setup_table_headers,
@@ -115,12 +114,12 @@ class ClientPage(QWidget):
 
     # Load Data
     def load_data(self):
-        query = f"""
+        query = f'''
             SELECT {', '.join(COLUMN_ORDER)}
             FROM client
             WHERE deleted_at IS NULL
             ORDER BY {COLUMN_ORDER[0]}
-        """
+        '''
         self.data = load_data_from_db(
             self.table, self.conn, query, HEADERS, self.refresh_btn
         )
@@ -162,7 +161,7 @@ class ClientPage(QWidget):
         confirm = QMessageBox.question(
             self,
             'Confirm Delete',
-            f"Are you sure you want to delete client: {client_name}?",
+            f'Are you sure you want to delete client: {client_name}?',
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
 
