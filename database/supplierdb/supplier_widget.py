@@ -5,13 +5,11 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QComboBox,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
     QTableWidget,
-    QTableWidgetItem,
     QVBoxLayout,
     QWidget,
 )
@@ -20,12 +18,15 @@ from PySide6.QtWidgets import (
 from core import (
     add_table_row,
     filter_table,
+    load_data_from_db,
+    remove_entity,
     reset_table_order,
+    row_to_dict,
+    setup_table_headers,
     setup_table_ui,
-    update_refresh_btn,
     update_table_row,
 )
-from database.supplierdb import SupplierFormDialog, remove_supplier
+from database.supplierdb import SupplierFormDialog
 
 # Define the column order matching your QTableWidget
 COLUMN_ORDER = [
@@ -35,6 +36,15 @@ COLUMN_ORDER = [
     'supplier_type',
     'status',
     'description'
+]
+
+HEADERS = [
+    'Supplier ID',
+    'Supplier Name',
+    'Contact',
+    'Type',
+    'Status',
+    'Description'
 ]
 
 
@@ -89,9 +99,7 @@ class SupplierPage(QWidget):
         header_layout.addWidget(search_bar)
 
         # Filter Function (By Category, default being name)
-        self.filter_box.addItems(
-            ['Supplier Name', 'Contact', 'Type', 'Status', 'Description']
-        )
+        self.filter_box.addItems(HEADERS[1:])  # [1:] exclude id column
         header_layout.addWidget(self.filter_box)
 
         # Push buttons to the right
@@ -102,69 +110,20 @@ class SupplierPage(QWidget):
         layout.addWidget(self.table)
 
     def setup_table(self):
-        self.table.setColumnCount(6)
-        self.table.setHorizontalHeaderLabels([
-            'Supplier ID', 'Supplier Name', 'Contact', 'Type', 'Status', 'Description'
-        ])
-        # Automatically resize certain columns to fit contents
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(
-            1, QHeaderView.ResizeMode.ResizeToContents
-        )  # Supplier Name
-        header.setSectionResizeMode(
-            2, QHeaderView.ResizeMode.ResizeToContents
-        )  # Contact
-        header.setSectionResizeMode(
-            3, QHeaderView.ResizeMode.ResizeToContents
-        )  # Type
-        header.setSectionResizeMode(
-            4, QHeaderView.ResizeMode.ResizeToContents
-        )  # Status
-        header.setSectionResizeMode(
-            5, QHeaderView.ResizeMode.Stretch
-        )  # Stretch Desc
+        setup_table_headers(self.table, HEADERS, stretch_column='Description')
         setup_table_ui(self.table, self.edit_supplier)
 
     # Load Data
     def load_data(self):
-        if not self.conn:
-            QMessageBox.critical(self,
-                                 'DB Error',
-                                 '❌ Could not connect to database')
-            return
-
-        try:
-            with self.conn.cursor() as cur:
-                cur.execute(
-                    "SELECT supplier_id, "
-                    "supplier_name, "
-                    "supplier_contact, "
-                    "supplier_type, "
-                    "status, "
-                    "description\n"
-                    "FROM supplier\n"
-                    "WHERE deleted_at IS NULL\n"
-                    "ORDER BY supplier_id;")
-                self.data = cur.fetchall()
-
-            # Disable sorting to safely reload rows
-            self.table.setSortingEnabled(False)
-
-            self.table.setRowCount(len(self.data))
-            for row_idx, row_data in enumerate(self.data):
-                for col_idx, value in enumerate(row_data):
-                    self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
-
-            # Re-enable sorting after reload
-            self.table.setSortingEnabled(True)
-
-            update_refresh_btn(self.refresh_btn, True)
-        except Exception as e:
-            update_refresh_btn(self.refresh_btn, False)
-            QMessageBox.critical(
-                self,
-                'DB Error',
-                f"⚠️ Failed to fetch suppliers:\n{e}")
+        query = f"""
+            SELECT {', '.join(COLUMN_ORDER)}
+            FROM supplier
+            WHERE deleted_at IS NULL
+            ORDER BY {COLUMN_ORDER[0]}
+        """
+        self.data = load_data_from_db(
+            self.table, self.conn, query, HEADERS, self.refresh_btn
+        )
 
     # Add Supplier
     def add_supplier(self):
@@ -176,15 +135,7 @@ class SupplierPage(QWidget):
 
     # Edit Supplier
     def edit_supplier(self, row):
-        # selected row into a dict
-        supplier_data = {
-            'supplier_id': self.table.item(row, 0).text(),  # hidden ID
-            'supplier_name': self.table.item(row, 1).text(),
-            'supplier_contact': self.table.item(row, 2).text(),
-            'supplier_type': self.table.item(row, 3).text(),
-            'status': self.table.item(row, 4).text(),
-            'description': self.table.item(row, 5).text()
-        }
+        supplier_data = row_to_dict(self.table, row, COLUMN_ORDER)
         dialog = SupplierFormDialog(
             parent=self,
             mode='edit',
@@ -216,5 +167,11 @@ class SupplierPage(QWidget):
         )
 
         if confirm == QMessageBox.StandardButton.Yes:
-            remove_supplier(self.conn, supplier_id, supplier_name)
+            remove_entity(
+                self.conn,
+                'supplier',
+                'supplier_id',
+                supplier_id,
+                supplier_name,
+                'Supplier')
             self.table.removeRow(row)

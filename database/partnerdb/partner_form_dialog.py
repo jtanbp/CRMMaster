@@ -16,12 +16,14 @@ from PySide6.QtWidgets import (
 # 3. Internal Library
 from core import (
     FormDialog,
+    edit_entity,
+    entity_name_exists,
+    insert_entity,
     update_counter,
     validate_characters,
     validate_max_length,
     validate_required,
 )
-from database.partnerdb import edit_partner, insert_partner, partner_name_exists
 
 
 class PartnerFormDialog(FormDialog):
@@ -113,7 +115,7 @@ class PartnerFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exists = partner_name_exists(self.conn, name)
+        name_exists = entity_name_exists(self.conn, 'partner', 'partner_name', name)
         if name_exists:
             QMessageBox.warning(
                 self,
@@ -138,7 +140,17 @@ class PartnerFormDialog(FormDialog):
         # ✅ If OK, reset palette back to normal
         self.input_name.setPalette(QApplication.palette())
 
-        partner_data = insert_partner(self.conn, name, contact, description)
+        data = {
+            'partner_name': name,
+            'partner_contact': contact,
+            'description': description,
+        }
+        partner_data = insert_entity(
+            self.conn,
+            'partner',
+            data,
+            'partner_id',
+            'Partner')
         self.partner_added.emit(partner_data)
         self.accept()
 
@@ -150,7 +162,13 @@ class PartnerFormDialog(FormDialog):
         partner_id = self.partner_data.get('partner_id')
 
         # 🔎 Check uniqueness
-        name_exists = partner_name_exists(self.conn, new_name, exclude_id=partner_id)
+        name_exists = entity_name_exists(
+            self.conn,
+            'partner',
+            'partner_name',
+            new_name,
+            'partner_id',
+            exclude_id=partner_id)
         if name_exists:
             QMessageBox.warning(
                 self,
@@ -182,7 +200,7 @@ class PartnerFormDialog(FormDialog):
             'description': self.input_desc.toPlainText()
         }
 
-        edit_partner(self.conn, partner_data)
+        edit_entity(self.conn, 'partner', 'partner_id', partner_data, 'Partner')
         self.partner_edited.emit(partner_data)
         self.accept()
 

@@ -17,13 +17,15 @@ from PySide6.QtWidgets import (
 # 3. Internal Library
 from core import (
     FormDialog,
+    edit_entity,
+    entity_name_exists,
+    insert_entity,
     update_counter,
     validate_characters,
     validate_max_length,
     validate_required,
     validate_selection,
 )
-from database.supplierdb import edit_supplier, insert_supplier, supplier_name_exists
 
 supplier_types = ['Direct', 'Aggregator', 'White Label', 'Payment Gateway', 'Other']
 supplier_status = ['Active', 'Inactive']
@@ -137,7 +139,8 @@ class SupplierFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exists = supplier_name_exists(self.conn, name)
+        name_exists = entity_name_exists(self.conn, 'supplier', 'supplier_name', name)
+
         if name_exists:
             QMessageBox.warning(
                 self,
@@ -162,9 +165,19 @@ class SupplierFormDialog(FormDialog):
         # ✅ If OK, reset palette back to normal
         self.input_name.setPalette(QApplication.palette())
 
-        supplier_data = insert_supplier(
-            self.conn, name, contact, supplier_type, status, description
-        )
+        data = {
+            'supplier_name': name,
+            'supplier_contact': contact,
+            'supplier_type': supplier_type,
+            'status': status,
+            'description': description,
+        }
+        supplier_data = insert_entity(
+            self.conn,
+            'supplier',
+            data,
+            'supplier_id',
+            'Supplier')
         self.supplier_added.emit(supplier_data)
         self.accept()
 
@@ -176,7 +189,13 @@ class SupplierFormDialog(FormDialog):
         supplier_id = self.supplier_data.get('supplier_id')
 
         # 🔎 Check uniqueness
-        name_exist = supplier_name_exists(self.conn, new_name, exclude_id=supplier_id)
+        name_exist = entity_name_exists(
+            self.conn,
+            'supplier',
+            'supplier_name',
+            new_name,
+            'supplier_id',
+            exclude_id=supplier_id)
         if name_exist:
             QMessageBox.warning(
                 self,
@@ -210,7 +229,7 @@ class SupplierFormDialog(FormDialog):
             'description': self.input_desc.toPlainText()
         }
 
-        edit_supplier(self.conn, supplier_data)
+        edit_entity(self.conn, 'supplier', 'supplier_id', supplier_data, 'Supplier')
         self.supplier_edited.emit(supplier_data)
         self.accept()
 

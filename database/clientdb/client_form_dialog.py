@@ -17,13 +17,15 @@ from PySide6.QtWidgets import (
 # 3. Internal Library
 from core import (
     FormDialog,
+    edit_entity,
+    entity_name_exists,
+    insert_entity,
     update_counter,
     validate_characters,
     validate_max_length,
     validate_required,
     validate_selection,
 )
-from database.clientdb import client_name_exists, edit_client, insert_client
 
 client_types = ['VIP', 'Client']
 client_status = ['Active', 'Inactive']
@@ -137,7 +139,7 @@ class ClientFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exists = client_name_exists(self.conn, name)
+        name_exists = entity_name_exists(self.conn, 'client', 'client_name', name)
         if name_exists:
             QMessageBox.warning(
                 self,
@@ -162,9 +164,14 @@ class ClientFormDialog(FormDialog):
         # ✅ If OK, reset palette back to normal
         self.input_name.setPalette(QApplication.palette())
 
-        client_data = insert_client(
-            self.conn, name, contact, client_type, status, description
-        )
+        data = {
+            'client_name': name,
+            'client_contact': contact,
+            'client_type': client_type,
+            'status': status,
+            'description': description,
+        }
+        client_data = insert_entity(self.conn, 'client', data, 'client_id', 'Client')
         self.client_added.emit(client_data)
         self.accept()
 
@@ -176,7 +183,13 @@ class ClientFormDialog(FormDialog):
         client_id = self.client_data.get('client_id')
 
         # 🔎 Check uniqueness
-        name_exists = client_name_exists(self.conn, new_name, exclude_id=client_id)
+        name_exists = entity_name_exists(
+            self.conn,
+            'client',
+            'client_name',
+            new_name,
+            'client_id',
+            exclude_id=client_id)
         if name_exists:
             QMessageBox.warning(
                 self,
@@ -210,7 +223,7 @@ class ClientFormDialog(FormDialog):
             'description': self.input_desc.toPlainText()
         }
 
-        edit_client(self.conn, client_data)
+        edit_entity(self.conn, 'client', 'client_id', client_data, 'Client')
         self.client_edited.emit(client_data)
         self.accept()
 

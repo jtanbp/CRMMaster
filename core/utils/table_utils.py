@@ -2,9 +2,33 @@
 
 # 2. Third Party Library
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QHeaderView, QTableWidget, QTableWidgetItem
 
 # 3. Internal Library
+
+
+def setup_table_headers(table: QTableWidget, headers: list, stretch_column: str = None):
+    """
+    Setup QTableWidget headers and resize behavior.
+
+    Args:
+        table: The QTableWidget to configure.
+        headers: List of column header labels.
+        stretch_column: Optional column name to stretch (e.g., 'Description').
+    """
+    table.setColumnCount(len(headers))
+    table.setHorizontalHeaderLabels(headers)
+
+    header = table.horizontalHeader()
+
+    # Stretch the chosen column, resize others to contents
+    for col, name in enumerate(headers):
+        if stretch_column and name == stretch_column:
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Stretch)
+            table.setColumnWidth(col, 100)
+        else:
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.ResizeToContents)
+            table.setColumnWidth(col, 120)
 
 
 def setup_table_ui(table: QTableWidget, edit_callback):
@@ -75,4 +99,14 @@ def reset_table_order(table: QTableWidget):
         table (QTableWidget): The table to reset.
     """
     table.setSortingEnabled(True)  # make sure sorting is allowed
-    table.sortItems(0, Qt.AscendingOrder)  # sort by first column (ID)
+    table.sortItems(0, Qt.SortOrder.AscendingOrder)  # sort by first column (ID)
+
+
+def row_to_dict(table, row, columns):
+    """
+    Convert a QTableWidget row into a dict using COLUMN_ORDER.
+    """
+    return {
+        col: (table.item(row, idx).text() if table.item(row, idx) else None)
+        for idx, col in enumerate(columns)
+    }
