@@ -2,15 +2,7 @@
 
 # 2. Third Party Library
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (
-    QApplication,
-    QComboBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QTextEdit,
-    QVBoxLayout,
-)
+from PySide6.QtWidgets import QApplication, QComboBox, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QVBoxLayout
 
 # 3. Internal Library
 from core import (
@@ -33,7 +25,7 @@ class ClientFormDialog(FormDialog):
     client_added = Signal(dict)
     client_edited = Signal(dict)
 
-    def __init__(self, parent=None, mode='add', client_data: dict = None, conn=None):
+    def __init__(self, parent=None, mode='add', table_name='client', client_data: dict = None, conn=None):
         super().__init__(parent)
 
         self.fields_layout = QVBoxLayout()
@@ -46,6 +38,7 @@ class ClientFormDialog(FormDialog):
         self.input_desc = QTextEdit()
         self.max_chars = 500
         self.counter_label = QLabel(f'{self.max_chars} characters remaining')
+        self.table_name = table_name
         self.mode = mode
         self.conn = conn
         self.client_data = client_data
@@ -101,8 +94,7 @@ class ClientFormDialog(FormDialog):
         client_desc_layout.addWidget(self.input_desc)
 
         input_counter_layout = QHBoxLayout()
-        input_counter_layout.addWidget(self.counter_label,
-                                       alignment=Qt.AlignmentFlag.AlignRight)
+        input_counter_layout.addWidget(self.counter_label, alignment=Qt.AlignmentFlag.AlignRight)
 
         if self.mode == 'edit':
             self.input_name.setText(self.client_data.get('client_name'))
@@ -137,12 +129,8 @@ class ClientFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exist = entity_name_exists(self.conn, 'client', 'client_name', name)
-        if not self.handle_duplicate_name(
-                self.input_name,
-                'Client',
-                name,
-                name_exist):
+        name_exist = entity_name_exists(self.conn, self.table_name, 'client_name', name)
+        if not self.handle_duplicate_name(self.input_name, 'Client', name, name_exist):
             return
 
         data = {
@@ -152,7 +140,7 @@ class ClientFormDialog(FormDialog):
             'status': status,
             'description': description,
         }
-        client_data = insert_entity(self.conn, 'client', data, 'client_id', 'Client')
+        client_data = insert_entity(self.conn, self.table_name, data, 'client_id', 'Client')
         self.client_added.emit(client_data)
         self.accept()
 
@@ -164,18 +152,9 @@ class ClientFormDialog(FormDialog):
         client_id = self.client_data.get('client_id')
 
         # 🔎 Check uniqueness
-        name_exist = entity_name_exists(
-            self.conn,
-            'client',
-            'client_name',
-            new_name,
-            'client_id',
-            exclude_id=client_id)
-        if not self.handle_duplicate_name(
-                self.input_name,
-                'Client',
-                new_name,
-                name_exist):
+        name_exist = entity_name_exists(self.conn, self.table_name, 'client_name',
+                                        new_name, 'client_id', exclude_id=client_id)
+        if not self.handle_duplicate_name(self.input_name, 'Client', new_name, name_exist):
             return
 
         client_data = {
@@ -187,7 +166,7 @@ class ClientFormDialog(FormDialog):
             'description': self.input_desc.toPlainText()
         }
 
-        edit_entity(self.conn, 'client', 'client_id', client_data, 'Client')
+        edit_entity(self.conn, self.table_name, 'client_id', client_data, 'Client')
         self.client_edited.emit(client_data)
         self.accept()
 
@@ -203,52 +182,26 @@ class ClientFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # Validate name
-        if not (validate_required(
-                name,
-                'Client Name',
-                self) and
-                validate_max_length(
-                    name,
-                    100,
-                    'Client Name',
-                    self) and
-                validate_characters(
-                    name,
-                    r'[A-Za-z0-9\s]+',
-                    'Client Name',
-                    self)):
+        if not (validate_required(name, 'Client Name', self) and
+                validate_max_length(name, 100, 'Client Name', self) and
+                validate_characters(name, r'[A-Za-z0-9\s]+', 'Client Name', self)):
             self.input_name.setFocus()
             return False
 
         # Validate contact (optional)
         if contact:
-            if not (validate_max_length(
-                    contact,
-                    50,
-                    'Client Contact',
-                    self) and
-                    validate_characters(
-                        contact,
-                        r'[A-Za-z0-9\s\+\-\(\)]*',
-                        'Client Contact',
-                        self)):
+            if not (validate_max_length(contact, 50, 'Client Contact', self) and
+                    validate_characters(contact, r'[A-Za-z0-9\s\+\-\(\)]*',
+                                        'Client Contact', self)):
                 self.input_contact.setFocus()
                 return False
 
         # Validate type and status
-        if not validate_selection(
-                client_type,
-                client_types,
-                'Client Type',
-                self):
+        if not validate_selection(client_type, client_types, 'Client Type', self):
             self.input_type.setFocus()
             return False
 
-        if not validate_selection(
-                status,
-                client_status,
-                'Status',
-                self):
+        if not validate_selection(status, client_status, 'Status', self):
             self.input_status.setFocus()
             return False
 

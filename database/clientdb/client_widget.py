@@ -51,13 +51,16 @@ class ClientPage(QWidget):
     client_added = Signal(dict)
     client_edited = Signal(dict)
 
-    def __init__(self, parent=None, conn=None):
+    def __init__(self, parent=None, dev_mode: bool = False, conn=None):
         super().__init__(parent)
 
         self.refresh_btn = QPushButton('🔄 Refresh')  # Pushbutton Refresh Notification
         self.table = QTableWidget()  # Stores data
         self.filter_box = QComboBox()  # For reference when doing searches
         self.data = {}  # Store data for filtering
+        self.table_name = 'client'
+        if dev_mode:
+            self.table_name += '_dev'
         self.setup_ui()
         self.conn = conn
         self.load_data()
@@ -116,7 +119,7 @@ class ClientPage(QWidget):
     def load_data(self):
         query = f'''
             SELECT {', '.join(COLUMN_ORDER)}
-            FROM client
+            FROM {self.table_name}
             WHERE deleted_at IS NULL
             ORDER BY {COLUMN_ORDER[0]}
         '''
@@ -126,7 +129,7 @@ class ClientPage(QWidget):
 
     # Add Client
     def add_client(self):
-        dialog = ClientFormDialog(self, 'add', conn=self.conn)
+        dialog = ClientFormDialog(self, 'add', self.table_name, conn=self.conn)
         dialog.client_added.connect(
             lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
         )
@@ -136,7 +139,7 @@ class ClientPage(QWidget):
     def edit_client(self, row):
         client_data = row_to_dict(self.table, row, COLUMN_ORDER)
         dialog = ClientFormDialog(
-            parent=self, mode='edit', client_data=client_data, conn=self.conn
+            parent=self, mode='edit', table_name=self.table_name, client_data=client_data, conn=self.conn
         )
         dialog.client_edited.connect(
             lambda data: update_table_row(
@@ -159,18 +162,11 @@ class ClientPage(QWidget):
         client_name = self.table.item(row, 1).text()
 
         confirm = QMessageBox.question(
-            self,
-            'Confirm Delete',
+            self, 'Confirm Delete',
             f'Are you sure you want to delete client: {client_name}?',
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
 
         if confirm == QMessageBox.StandardButton.Yes:
-            remove_entity(
-                self.conn,
-                'client',
-                'client_id',
-                client_id,
-                client_name,
-                'Client')
+            remove_entity(self.conn, self.table_name, 'client_id', client_id, client_name, 'Client')
             self.table.removeRow(row)

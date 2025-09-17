@@ -3,13 +3,7 @@
 # 2. Third Party Library
 import requests
 from PySide6.QtCore import QThread, Signal
-from PySide6.QtWidgets import (
-    QLineEdit,
-    QTableWidget,
-    QTableWidgetItem,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide6.QtWidgets import QLineEdit, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
 
 # 3. Internal Library
 

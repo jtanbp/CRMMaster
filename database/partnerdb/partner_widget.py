@@ -47,13 +47,16 @@ class PartnerPage(QWidget):
     partner_saved = Signal(dict)
     partner_edited = Signal(dict)
 
-    def __init__(self, parent=None, conn=None):
+    def __init__(self, parent=None, dev_mode: bool = False, conn=None):
         super().__init__(parent)
 
         self.refresh_btn = QPushButton('🔄 Refresh')  # Pushbutton Refresh Notification
         self.table = QTableWidget()  # Stores data
         self.filter_box = QComboBox()  # For reference when doing searches
         self.data = {}  # Store data for filtering
+        self.table_name = 'partner'
+        if dev_mode:
+            self.table_name += '_dev'
         self.setup_ui()
         self.conn = conn
         self.load_data()
@@ -112,7 +115,7 @@ class PartnerPage(QWidget):
     def load_data(self):
         query = f'''
             SELECT {', '.join(COLUMN_ORDER)}
-            FROM partner
+            FROM {self.table_name}
             WHERE deleted_at IS NULL
             ORDER BY {COLUMN_ORDER[0]}
         '''
@@ -122,7 +125,7 @@ class PartnerPage(QWidget):
 
     # Add partner
     def add_partner(self):
-        dialog = PartnerFormDialog(self, 'add', conn=self.conn)
+        dialog = PartnerFormDialog(self, 'add', self.table_name, conn=self.conn)
         dialog.partner_added.connect(
             lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
         )
@@ -133,7 +136,7 @@ class PartnerPage(QWidget):
         # selected row into a dict
         partner_data = row_to_dict(self.table, row, COLUMN_ORDER)
         dialog = PartnerFormDialog(
-            parent=self, mode='edit', partner_data=partner_data, conn=self.conn
+            parent=self, mode='edit', table_name=self.table_name, partner_data=partner_data, conn=self.conn
         )
         dialog.partner_edited.connect(
             lambda data: update_table_row(
@@ -162,11 +165,6 @@ class PartnerPage(QWidget):
         )
 
         if confirm == QMessageBox.StandardButton.Yes:
-            remove_entity(
-                self.conn,
-                'partner',
-                'partner_id',
-                partner_id,
-                partner_name,
-                'Partner')
+            remove_entity(self.conn, self.table_name, 'partner_id', partner_id,
+                          partner_name, 'Partner')
             self.table.removeRow(row)

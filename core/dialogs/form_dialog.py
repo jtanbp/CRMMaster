@@ -2,15 +2,7 @@
 
 # 2. Third Party Library
 from PySide6.QtGui import QColor, QPalette
-from PySide6.QtWidgets import (
-    QApplication,
-    QDialog,
-    QHBoxLayout,
-    QMessageBox,
-    QPushButton,
-    QSizePolicy,
-    QVBoxLayout,
-)
+from PySide6.QtWidgets import QApplication, QDialog, QHBoxLayout, QMessageBox, QPushButton, QSizePolicy, QVBoxLayout
 
 # 3. Internal Library
 
@@ -50,8 +42,7 @@ class FormDialog(QDialog):
         """
         if name_exists:
             QMessageBox.warning(
-                self,
-                'Duplicate Name',
+                self, 'Duplicate Name',
                 f'A {entity_label.lower()} with the name "{name}" already exists.'
             )
             # highlight in red

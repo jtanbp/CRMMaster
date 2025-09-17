@@ -36,7 +36,7 @@ class SupplierFormDialog(FormDialog):
     supplier_added = Signal(dict)
     supplier_edited = Signal(dict)
 
-    def __init__(self, parent=None, mode='add', supplier_data: dict = None, conn=None):
+    def __init__(self, parent=None, mode='add', table_name='supplier', supplier_data: dict = None, conn=None):
         super().__init__(parent)
 
         self.fields_layout = QVBoxLayout()
@@ -53,6 +53,7 @@ class SupplierFormDialog(FormDialog):
         self.end_checkbox = QCheckBox()
         self.max_chars = 500
         self.counter_label = QLabel(f'{self.max_chars} characters remaining')
+        self.table_name = table_name
         self.mode = mode
         self.conn = conn
         self.supplier_data = supplier_data
@@ -127,8 +128,7 @@ class SupplierFormDialog(FormDialog):
         supplier_desc_layout.addWidget(self.input_desc)
 
         input_counter_layout = QHBoxLayout()
-        input_counter_layout.addWidget(self.counter_label,
-                                       alignment=Qt.AlignmentFlag.AlignRight)
+        input_counter_layout.addWidget(self.counter_label, alignment=Qt.AlignmentFlag.AlignRight)
 
         contract_dates_layout = QHBoxLayout()
 
@@ -202,13 +202,9 @@ class SupplierFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # 🔎 Check uniqueness
-        name_exist = entity_name_exists(self.conn, 'supplier', 'supplier_name', name)
+        name_exist = entity_name_exists(self.conn, self.table_name, 'supplier_name', name)
 
-        if not self.handle_duplicate_name(
-                self.input_name,
-                'Supplier',
-                name,
-                name_exist):
+        if not self.handle_duplicate_name(self.input_name, 'Supplier', name, name_exist):
             return
 
         # Handle dates (optional)
@@ -227,17 +223,12 @@ class SupplierFormDialog(FormDialog):
             'supplier_name': name,
             'supplier_contact': contact,
             'supplier_type': supplier_type,
-            'status': status,
+            'supplier_status': status,
             'description': description,
             'contract_start': contract_start,
             'contract_end': contract_end,
         }
-        supplier_data = insert_entity(
-            self.conn,
-            'supplier',
-            data,
-            'supplier_id',
-            'Supplier')
+        supplier_data = insert_entity(self.conn, self.table_name, data, 'supplier_id', 'Supplier')
         self.supplier_added.emit(supplier_data)
         self.accept()
 
@@ -249,18 +240,9 @@ class SupplierFormDialog(FormDialog):
         supplier_id = self.supplier_data.get('supplier_id')
 
         # 🔎 Check uniqueness
-        name_exist = entity_name_exists(
-            self.conn,
-            'supplier',
-            'supplier_name',
-            new_name,
-            'supplier_id',
-            exclude_id=supplier_id)
-        if not self.handle_duplicate_name(
-                self.input_name,
-                'Supplier',
-                new_name,
-                name_exist):
+        name_exist = entity_name_exists(self.conn, self.table_name, 'supplier_name',
+                                        new_name, 'supplier_id', exclude_id=supplier_id)
+        if not self.handle_duplicate_name(self.input_name, 'Supplier', new_name, name_exist):
             return
         elif name_exist is None:
             self.accept()
@@ -285,7 +267,7 @@ class SupplierFormDialog(FormDialog):
             'supplier_name': self.input_name.text(),
             'supplier_contact': self.input_contact.text(),
             'supplier_type': self.input_type.currentText(),
-            'status': self.input_status.currentText(),
+            'supplier_status': self.input_status.currentText(),
             'description': self.input_desc.toPlainText(),
             'contract_start': contract_start,
             'contract_end': contract_end,
@@ -307,52 +289,26 @@ class SupplierFormDialog(FormDialog):
         description = self.input_desc.toPlainText()
 
         # Validate name
-        if not (validate_required(
-                name,
-                'Supplier Name',
-                self) and
-                validate_max_length(
-                    name,
-                    100,
-                    'Supplier Name',
-                    self) and
-                validate_characters(
-                    name,
-                    r'[A-Za-z0-9\s]+',
-                    'Supplier Name',
-                    self)):
+        if not (validate_required(name, 'Supplier Name', self) and
+                validate_max_length(name, 100, 'Supplier Name', self) and
+                validate_characters(name, r'[A-Za-z0-9\s]+', 'Supplier Name', self)):
             self.input_name.setFocus()
             return False
 
         # Validate contact (optional)
         if contact:
-            if not (validate_max_length(
-                    contact,
-                    50,
-                    'Supplier Contact',
-                    self) and
-                    validate_characters(
-                        contact,
-                        r'[A-Za-z0-9\s\+\-\(\)]*',
-                        'Supplier Contact',
-                        self)):
+            if not (validate_max_length(contact, 50, 'Supplier Contact', self) and
+                    validate_characters(contact, r'[A-Za-z0-9\s\+\-\(\)]*',
+                                        'Supplier Contact', self)):
                 self.input_contact.setFocus()
                 return False
 
         # Validate type and status
-        if not validate_selection(
-                supplier_type,
-                supplier_types,
-                'Supplier Type',
-                self):
+        if not validate_selection(supplier_type, supplier_types, 'Supplier Type', self):
             self.input_type.setFocus()
             return False
 
-        if not validate_selection(
-                status,
-                supplier_status,
-                'Status',
-                self):
+        if not validate_selection(status, supplier_status, 'Status', self):
             self.input_status.setFocus()
             return False
 
@@ -367,30 +323,21 @@ class SupplierFormDialog(FormDialog):
         if self.start_checkbox.isChecked():
             if not self.input_start_date.date().isValid():
                 self.input_start_date.setFocus()
-                QMessageBox.warning(
-                    self,
-                    'Invalid Date',
-                    'Please enter a valid Start Date.')
+                QMessageBox.warning(self, 'Invalid Date', 'Please enter a valid Start Date.')
                 return False
 
         # End date
         if self.end_checkbox.isChecked():
             if not self.input_end_date.date().isValid():
                 self.input_end_date.setFocus()
-                QMessageBox.warning(
-                    self,
-                    'Invalid Date',
-                    'Please enter a valid End Date.')
+                QMessageBox.warning(self, 'Invalid Date', 'Please enter a valid End Date.')
                 return False
 
         # Optional: ensure start <= end
         if self.start_checkbox.isChecked() and self.end_checkbox.isChecked():
             if self.input_start_date.date() > self.input_end_date.date():
                 self.input_start_date.setFocus()
-                QMessageBox.warning(
-                    self,
-                    'Invalid Dates',
-                    'Start Date cannot be after End Date.')
+                QMessageBox.warning(self, 'Invalid Dates', 'Start Date cannot be after End Date.')
                 return False
 
         return True

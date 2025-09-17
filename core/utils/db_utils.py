@@ -71,10 +71,7 @@ def insert_entity(conn, table, data, id_column, display_name):
     - display_name: human readable name ('Supplier' / 'Client')
     """
     if not conn:
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            '❌ Could not connect to database')
+        QMessageBox.critical(None, 'DB Error''❌ Could not connect to database')
         return None
 
     try:
@@ -91,25 +88,16 @@ def insert_entity(conn, table, data, id_column, display_name):
         entity_data = {id_column: new_id, **data}
 
         conn.commit()
-        QMessageBox.information(
-            None,
-            'Success',
-            f'✅ {display_name} added')
+        QMessageBox.information(None, 'Success', f'✅ {display_name} added')
         return entity_data
     except Exception as e:
         conn.rollback()
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            f'⚠️ Failed to add {display_name.lower()}:\n{e}')
+        QMessageBox.critical(None, 'DB Error', f'⚠️ Failed to add {display_name.lower()}:\n{e}')
 
 
 def remove_entity(conn, table, id_column, entity_id, name_value, display_name):
     if not conn:
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            '❌ Could not connect to database')
+        QMessageBox.critical(None, 'DB Error', '❌ Could not connect to database')
         return None
 
     try:
@@ -123,24 +111,15 @@ def remove_entity(conn, table, id_column, entity_id, name_value, display_name):
                 (entity_id,),
             )
         conn.commit()
-        QMessageBox.information(
-            None,
-            'Deleted',
-            f'❌ {display_name} "{name_value}" removed')
+        QMessageBox.information(None, 'Deleted', f'❌ {display_name} "{name_value}" removed')
     except Exception as e:
         conn.rollback()
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            f'⚠️ Failed to delete {display_name.lower()}:\n{e}')
+        QMessageBox.critical(None, 'DB Error', f'⚠️ Failed to delete {display_name.lower()}:\n{e}')
 
 
 def edit_entity(conn, table, id_column, entity_data, display_name):
     if not conn:
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            '❌ Could not connect to database')
+        QMessageBox.critical(None, 'DB Error', '❌ Could not connect to database')
         return None
 
     try:
@@ -159,25 +138,16 @@ def edit_entity(conn, table, id_column, entity_data, display_name):
             cur.execute(sql, tuple(values))
         conn.commit()
 
-        QMessageBox.information(
-            None,
-            'Edited',
-            f'🔄 {display_name} edited')
+        QMessageBox.information(None, 'Edited', f'🔄 {display_name} edited')
     except Exception as e:
         conn.rollback()
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            f'⚠️ Failed to edit {display_name.lower()}:\n{e}')
+        QMessageBox.critical(None, 'DB Error', f'⚠️ Failed to edit {display_name.lower()}:\n{e}')
 
 
 def entity_name_exists(
         conn, table, name_column, name_value, id_column=None, exclude_id=None):
     if not conn:
-        QMessageBox.critical(
-            None,
-            'DB Error',
-            '❌ Could not connect to database')
+        QMessageBox.critical(None, 'DB Error', '❌ Could not connect to database')
         return None
 
     with conn.cursor() as cur:

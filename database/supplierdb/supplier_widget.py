@@ -33,7 +33,7 @@ COLUMN_ORDER = [
     'supplier_name',
     'supplier_contact',
     'supplier_type',
-    'status',
+    'supplier_status',
     'description',
     'contract_start',
     'contract_end'
@@ -55,13 +55,16 @@ class SupplierPage(QWidget):
     supplier_saved = Signal(dict)
     supplier_edited = Signal(dict)
 
-    def __init__(self, parent=None, conn=None):
+    def __init__(self, parent=None, dev_mode: bool = False, conn=None):
         super().__init__(parent)
 
         self.refresh_btn = QPushButton('🔄 Refresh')  # Pushbutton Refresh Notification
         self.table = QTableWidget()  # Stores data
         self.filter_box = QComboBox()  # For reference when doing searches
         self.data = {}  # Store data for filtering
+        self.table_name = 'supplier'
+        if dev_mode:
+            self.table_name += '_dev'
         self.setup_ui()
         self.conn = conn
         self.load_data()
@@ -123,7 +126,7 @@ class SupplierPage(QWidget):
     def load_data(self):
         query = f'''
             SELECT {', '.join(COLUMN_ORDER)}
-            FROM supplier
+            FROM {self.table_name}
             WHERE deleted_at IS NULL
             ORDER BY {COLUMN_ORDER[0]}
         '''
@@ -133,7 +136,7 @@ class SupplierPage(QWidget):
 
     # Add Supplier
     def add_supplier(self):
-        dialog = SupplierFormDialog(self, 'add', conn=self.conn)
+        dialog = SupplierFormDialog(self, 'add', self.table_name, conn=self.conn)
         dialog.supplier_added.connect(
             lambda data: add_table_row(self.table, [data[key] for key in COLUMN_ORDER])
         )
@@ -145,8 +148,10 @@ class SupplierPage(QWidget):
         dialog = SupplierFormDialog(
             parent=self,
             mode='edit',
+            table_name=self.table_name,
             supplier_data=supplier_data,
-            conn=self.conn)
+            conn=self.conn
+        )
         dialog.supplier_edited.connect(
             lambda data: update_table_row(
                 self.table, row, [data[key] for key in COLUMN_ORDER]
@@ -158,26 +163,17 @@ class SupplierPage(QWidget):
     def remove_supplier(self):
         row = self.table.currentRow()
         if row < 0:
-            QMessageBox.warning(self, 'Remove Supplier',
-                                '⚠️ Please select a supplier to remove')
+            QMessageBox.warning(self, 'Remove Supplier', '⚠️ Please select a supplier to remove')
             return
 
         supplier_id = self.table.item(row, 0).text()
         supplier_name = self.table.item(row, 1).text()
 
-        confirm = QMessageBox.question(
-            self,
-            'Confirm Delete',
-            f'Are you sure you want to delete supplier: {supplier_name}?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
+        confirm = QMessageBox.question(self, 'Confirm Delete',
+                                       f'Are you sure you want to delete supplier: {supplier_name}?',
+                                       QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 
         if confirm == QMessageBox.StandardButton.Yes:
-            remove_entity(
-                self.conn,
-                'supplier',
-                'supplier_id',
-                supplier_id,
-                supplier_name,
-                'Supplier')
+            remove_entity(self.conn, self.table_name, 'supplier_id', supplier_id,
+                          supplier_name, 'Supplier')
             self.table.removeRow(row)

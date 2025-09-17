@@ -13,10 +13,7 @@ def validate_required(
         parent: QWidget = None) -> bool:
     """Ensure the field is not empty."""
     if not value.strip():
-        QMessageBox.warning(
-            parent,
-            'Validation Error',
-            f'{field_name} cannot be empty.')
+        QMessageBox.warning(parent, 'Validation Error', f'{field_name} cannot be empty.')
         return False
     return True
 
@@ -28,10 +25,8 @@ def validate_max_length(
         parent: QWidget = None) -> bool:
     """Ensure the field does not exceed max length."""
     if len(value.strip()) > max_length:
-        QMessageBox.warning(
-            parent,
-            'Validation Error',
-            f'{field_name} exceeds maximum length of {max_length}.')
+        QMessageBox.warning(parent, 'Validation Error',
+                            f'{field_name} exceeds maximum length of {max_length}.')
         return False
     return True
 
@@ -43,10 +38,7 @@ def validate_characters(
         parent: QWidget = None) -> bool:
     """Validate allowed characters using a regex."""
     if not re.fullmatch(allowed_regex, value.strip()):
-        QMessageBox.warning(
-            parent,
-            'Validation Error',
-            f'{field_name} contains invalid characters.')
+        QMessageBox.warning(parent, 'Validation Error', f'{field_name} contains invalid characters.')
         return False
     return True
 
@@ -58,9 +50,6 @@ def validate_selection(
         parent: QWidget = None) -> bool:
     """Validate that a dropdown selection is in allowed options."""
     if value not in allowed_options:
-        QMessageBox.warning(
-            parent,
-            'Validation Error',
-            f'{field_name} selection is invalid.')
+        QMessageBox.warning(parent, 'Validation Error', f'{field_name} selection is invalid.')
         return False
     return True
