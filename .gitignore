@@ -49,7 +49,6 @@ build-*/
 # Environment files
 .env
 *.local
-*.idea
 
 # Folders to ignore
 /.venv
