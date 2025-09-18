@@ -22,10 +22,10 @@ client_status = ['Active', 'Inactive']
 
 
 class ClientFormDialog(FormDialog):
-    client_added = Signal(dict)
-    client_edited = Signal(dict)
+    data_added = Signal(dict)
+    data_edited = Signal(dict)
 
-    def __init__(self, parent=None, mode='add', table_name='client', client_data: dict = None, conn=None):
+    def __init__(self, parent=None, mode='add', table_name='client', data_dict: dict = None, conn=None):
         super().__init__(parent)
 
         self.fields_layout = QVBoxLayout()
@@ -41,7 +41,7 @@ class ClientFormDialog(FormDialog):
         self.table_name = table_name
         self.mode = mode
         self.conn = conn
-        self.client_data = client_data
+        self.client_data = data_dict
         self.parent = parent
 
         self.setWindowTitle('📦Client Form')
@@ -141,7 +141,7 @@ class ClientFormDialog(FormDialog):
             'description': description,
         }
         client_data = insert_entity(self.conn, self.table_name, data, 'client_id', 'Client')
-        self.client_added.emit(client_data)
+        self.data_added.emit(client_data)
         self.accept()
 
     def manage_client(self):
@@ -167,7 +167,7 @@ class ClientFormDialog(FormDialog):
         }
 
         edit_entity(self.conn, self.table_name, 'client_id', client_data, 'Client')
-        self.client_edited.emit(client_data)
+        self.data_edited.emit(client_data)
         self.accept()
 
     def reset_name_highlight(self):

@@ -18,10 +18,10 @@ from core import (
 
 
 class PartnerFormDialog(FormDialog):
-    partner_added = Signal(dict)
-    partner_edited = Signal(dict)
+    data_added = Signal(dict)
+    data_edited = Signal(dict)
 
-    def __init__(self, parent=None, mode='add', table_name='partner', partner_data: dict = None, conn=None):
+    def __init__(self, parent=None, mode='add', table_name='partner', data_dict: dict = None, conn=None):
         super().__init__(parent)
 
         self.fields_layout = QVBoxLayout()
@@ -35,7 +35,7 @@ class PartnerFormDialog(FormDialog):
         self.table_name = table_name
         self.mode = mode
         self.conn = conn
-        self.partner_data = partner_data
+        self.partner_data = data_dict
         self.parent = parent
 
         self.setWindowTitle('📦Partner Form')
@@ -116,7 +116,7 @@ class PartnerFormDialog(FormDialog):
             'description': description,
         }
         partner_data = insert_entity(self.conn, self.table_name, data, 'partner_id', 'Partner')
-        self.partner_added.emit(partner_data)
+        self.data_added.emit(partner_data)
         self.accept()
 
     def manage_partner(self):
@@ -140,7 +140,7 @@ class PartnerFormDialog(FormDialog):
         }
 
         edit_entity(self.conn, self.table_name, 'partner_id', partner_data, 'Partner')
-        self.partner_edited.emit(partner_data)
+        self.data_edited.emit(partner_data)
         self.accept()
 
     def reset_name_highlight(self):

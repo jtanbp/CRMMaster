@@ -3,6 +3,7 @@
 # 2. Third Party Library
 from PySide6.QtWidgets import QMessageBox, QTableWidgetItem
 
+
 # 3. Internal Library
 
 
@@ -18,10 +19,7 @@ def load_data_from_db(widget, conn, query, headers, refresh_btn=None):
         refresh_btn: optional QPushButton to update with status.
     """
     if not conn:
-        QMessageBox.critical(
-            widget,
-            'DB Error',
-            '❌ Could not connect to database')
+        QMessageBox.critical(widget, 'DB Error', '❌ Could not connect to database')
         return []
 
     try:
@@ -55,10 +53,7 @@ def load_data_from_db(widget, conn, query, headers, refresh_btn=None):
             from core import update_refresh_btn
             update_refresh_btn(refresh_btn, False)
 
-        QMessageBox.critical(
-            widget,
-            'DB Error',
-            f'⚠️ Failed to fetch data:\n{e}')
+        QMessageBox.critical(widget, 'DB Error', f'⚠️ Failed to fetch data:\n{e}')
         return []
 
 
@@ -71,7 +66,7 @@ def insert_entity(conn, table, data, id_column, display_name):
     - display_name: human readable name ('Supplier' / 'Client')
     """
     if not conn:
-        QMessageBox.critical(None, 'DB Error''❌ Could not connect to database')
+        QMessageBox.critical(None, 'DB Error', '❌ Could not connect to database')
         return None
 
     try:

@@ -33,10 +33,10 @@ supplier_status = ['Active', 'Inactive']
 
 
 class SupplierFormDialog(FormDialog):
-    supplier_added = Signal(dict)
-    supplier_edited = Signal(dict)
+    data_added = Signal(dict)
+    data_edited = Signal(dict)
 
-    def __init__(self, parent=None, mode='add', table_name='supplier', supplier_data: dict = None, conn=None):
+    def __init__(self, parent=None, mode='add', table_name='supplier', data_dict: dict = None, conn=None):
         super().__init__(parent)
 
         self.fields_layout = QVBoxLayout()
@@ -56,7 +56,7 @@ class SupplierFormDialog(FormDialog):
         self.table_name = table_name
         self.mode = mode
         self.conn = conn
-        self.supplier_data = supplier_data
+        self.supplier_data = data_dict
         self.parent = parent
 
         self.setWindowTitle('📦Supplier Form')
@@ -229,7 +229,7 @@ class SupplierFormDialog(FormDialog):
             'contract_end': contract_end,
         }
         supplier_data = insert_entity(self.conn, self.table_name, data, 'supplier_id', 'Supplier')
-        self.supplier_added.emit(supplier_data)
+        self.data_added.emit(supplier_data)
         self.accept()
 
     def manage_supplier(self):
@@ -274,7 +274,7 @@ class SupplierFormDialog(FormDialog):
         }
 
         edit_entity(self.conn, self.table_name, 'supplier_id', supplier_data, 'Supplier')
-        self.supplier_edited.emit(supplier_data)
+        self.data_edited.emit(supplier_data)
         self.accept()
 
     def reset_name_highlight(self):
