@@ -273,7 +273,7 @@ class SupplierFormDialog(FormDialog):
             'contract_end': contract_end,
         }
 
-        edit_entity(self.conn, 'supplier', 'supplier_id', supplier_data, 'Supplier')
+        edit_entity(self.conn, self.table_name, 'supplier_id', supplier_data, 'Supplier')
         self.supplier_edited.emit(supplier_data)
         self.accept()
 
