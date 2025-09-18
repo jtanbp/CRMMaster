@@ -18,8 +18,8 @@ from core import (
 
 
 class PartnerFormDialog(FormDialog):
-    data_added = Signal(dict)
-    data_edited = Signal(dict)
+    data_added = Signal(dict)  # Required to update in base page widget
+    data_edited = Signal(dict)  # Required to update in base page widget
 
     def __init__(self, parent=None, mode='add', table_name='partner', data_dict: dict = None, conn=None):
         super().__init__(parent)
@@ -139,7 +139,8 @@ class PartnerFormDialog(FormDialog):
             'description': self.input_desc.toPlainText()
         }
 
-        edit_entity(self.conn, self.table_name, 'partner_id', partner_data, 'Partner')
+        partner_data = edit_entity(self.conn, self.table_name, 'partner_id',
+                                   partner_data, 'Partner')
         self.data_edited.emit(partner_data)
         self.accept()
 

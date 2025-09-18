@@ -2,7 +2,7 @@
 
 # 2. Third Party Library
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QHeaderView, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QTableWidget, QTableWidgetItem
 
 # 3. Internal Library
 
@@ -21,14 +21,24 @@ def setup_table_headers(table: QTableWidget, headers: list, stretch_column: str 
 
     header = table.horizontalHeader()
 
+    # ✅ Allow resizing
+    header.setSectionsMovable(False)  # prevent drag reorder
+    header.setSectionsClickable(True)  # keep sorting
+    header.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)  # resizable
+
+    # ✅ Extra safeguard: completely disable drag/drop on the table
+    table.setDragEnabled(False)
+    table.setDragDropMode(QAbstractItemView.DragDropMode.NoDragDrop)
+    table.setDragDropOverwriteMode(False)
+
     # Stretch the chosen column, resize others to contents
     for col, name in enumerate(headers):
         if stretch_column and name == stretch_column:
             header.setSectionResizeMode(col, QHeaderView.ResizeMode.Stretch)
-            table.setColumnWidth(col, 100)
+            table.setColumnWidth(col, 200)
         else:
-            header.setSectionResizeMode(col, QHeaderView.ResizeMode.ResizeToContents)
-            table.setColumnWidth(col, 120)
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
+            table.setColumnWidth(col, 80)
 
 
 def setup_table_ui(table: QTableWidget, edit_callback):
@@ -83,7 +93,8 @@ def add_table_row(table: QTableWidget, data: list):
         data: Either a list/tuple of values or a dict (values will be used in order).
     """
     # Insert a new row at the bottom
-    new_row_index = table.rowCount()
+    # new_row_index = table.rowCount()
+    new_row_index = 0  # Shift add row to the top
     table.insertRow(new_row_index)
 
     # Fill the row
@@ -100,7 +111,7 @@ def reset_table_order(table: QTableWidget):
     """
     # TODO: The sorting right now is not quite right, it sorts based on first digit
     table.setSortingEnabled(True)  # make sure sorting is allowed
-    table.sortItems(0, Qt.SortOrder.AscendingOrder)  # sort by first column (ID)
+    table.sortItems(0, Qt.SortOrder.DescendingOrder)  # sort by first column (ID)
 
 
 def row_to_dict(table, row, columns):

@@ -33,8 +33,8 @@ supplier_status = ['Active', 'Inactive']
 
 
 class SupplierFormDialog(FormDialog):
-    data_added = Signal(dict)
-    data_edited = Signal(dict)
+    data_added = Signal(dict)  # Required to update in base page widget
+    data_edited = Signal(dict)  # Required to update in base page widget
 
     def __init__(self, parent=None, mode='add', table_name='supplier', data_dict: dict = None, conn=None):
         super().__init__(parent)
@@ -69,13 +69,13 @@ class SupplierFormDialog(FormDialog):
 
         # Contract Start Date
         self.input_start_date.setCalendarPopup(True)
-        self.input_start_date.setDisplayFormat('yyyy-MM-dd')
+        self.input_start_date.setDisplayFormat('dd-MM-yyyy')
         self.input_start_date.setDate(QDate.currentDate())  # empty date
         self.input_start_date.setEnabled(False)
 
         # Contract End Date
         self.input_end_date.setCalendarPopup(True)
-        self.input_end_date.setDisplayFormat('yyyy-MM-dd')
+        self.input_end_date.setDisplayFormat('dd-MM-yyyy')
         self.input_end_date.setDate(QDate.currentDate())
         self.input_end_date.setEnabled(False)
 
@@ -209,12 +209,12 @@ class SupplierFormDialog(FormDialog):
 
         # Handle dates (optional)
         contract_start = (
-            self.input_start_date.date().toString("yyyy-MM-dd")
+            self.input_start_date.date().toString('yyyy-MM-dd')
             if self.start_checkbox.isChecked()
             else None
         )
         contract_end = (
-            self.input_end_date.date().toString("yyyy-MM-dd")
+            self.input_end_date.date().toString('yyyy-MM-dd')
             if self.end_checkbox.isChecked()
             else None
         )
@@ -252,12 +252,12 @@ class SupplierFormDialog(FormDialog):
 
         # Handle dates (optional)
         contract_start = (
-            self.input_start_date.date().toString("yyyy-MM-dd")
+            self.input_start_date.date().toString('yyyy-MM-dd')
             if self.start_checkbox.isChecked()
             else None
         )
         contract_end = (
-            self.input_end_date.date().toString("yyyy-MM-dd")
+            self.input_end_date.date().toString('yyyy-MM-dd')
             if self.end_checkbox.isChecked()
             else None
         )
@@ -273,7 +273,8 @@ class SupplierFormDialog(FormDialog):
             'contract_end': contract_end,
         }
 
-        edit_entity(self.conn, self.table_name, 'supplier_id', supplier_data, 'Supplier')
+        supplier_data = edit_entity(self.conn, self.table_name,
+                                    'supplier_id', supplier_data, 'Supplier')
         self.data_edited.emit(supplier_data)
         self.accept()
 

@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Fix supplier edit">
-      <change afterPath="$PROJECT_DIR$/core/widgets/base_page_widget.py" afterDir="false" />
+    <list default="true" id="9bfefdb0-3144-45e4-9d4a-3f9bbbc68141" name="Changes" comment="Base Page Widget Class Set Up">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils/db_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/db_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils/table_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils/table_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/widgets/base_page_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/widgets/base_page_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_form_dialog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/clientdb/client_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/clientdb/client_widget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/partnerdb/partner_form_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/partnerdb/partner_form_dialog.py" afterDir="false" />
@@ -55,40 +56,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.db.executor&quot;: &quot;Run&quot;,
-    &quot;Python.flake8.executor&quot;: &quot;Run&quot;,
-    &quot;Python.form_dialog.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run_main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.supplier_database.executor&quot;: &quot;Run&quot;,
-    &quot;Python.supplier_form_dialog.executor&quot;: &quot;Run&quot;,
-    &quot;Python.supplier_form_widget.executor&quot;: &quot;Run&quot;,
-    &quot;Python.supplier_widget.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test_database.executor&quot;: &quot;Run&quot;,
-    &quot;Python.testfile.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;productdb&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/jowie/PycharmProjects/CRMMaster&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Python&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.db.executor": "Run",
+    "Python.flake8.executor": "Run",
+    "Python.form_dialog.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.run_main.executor": "Run",
+    "Python.supplier_database.executor": "Run",
+    "Python.supplier_form_dialog.executor": "Run",
+    "Python.supplier_form_widget.executor": "Run",
+    "Python.supplier_widget.executor": "Debug",
+    "Python.test_database.executor": "Run",
+    "Python.testfile.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "productdb",
+    "last_opened_file_path": "C:/Users/jowie/PycharmProjects/CRMMaster",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.sourceCode.Python",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\jowie\PycharmProjects\CRMMaster" />
@@ -104,7 +105,7 @@
       <recent name="C:\Users\jowie\PycharmProjects\CRMMaster\database" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.flake8">
+  <component name="RunManager" selected="Python.run_main">
     <configuration name="flake8" type="PythonConfigurationType" factoryName="Python">
       <module name="CRMMaster" />
       <option name="ENV_FILES" value="" />
@@ -154,8 +155,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.flake8" />
       <item itemvalue="Python.run_main" />
+      <item itemvalue="Python.flake8" />
     </list>
   </component>
   <component name="SharedIndexes">
@@ -180,6 +181,7 @@
       <workItem from="1757554602733" duration="17784000" />
       <workItem from="1757639723470" duration="26507000" />
       <workItem from="1757736944783" duration="13654000" />
+      <workItem from="1758189133793" duration="7531000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <option name="closed" value="true" />
@@ -389,7 +391,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758182189566</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Base Page Widget Class Set Up">
+      <option name="closed" value="true" />
+      <created>1758189420521</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1758189420521</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -419,7 +429,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="first commit" />
     <MESSAGE value="Base supplier widget set up" />
     <MESSAGE value="Base clietn setup widget set up" />
     <MESSAGE value="Base client setup widget set up" />
@@ -444,13 +453,14 @@
     <MESSAGE value="Fix adding and editing to supplier" />
     <MESSAGE value="Updated Supplier Table, fixed linting to 120 line length" />
     <MESSAGE value="Fix supplier edit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix supplier edit" />
+    <MESSAGE value="Base Page Widget Class Set Up" />
+    <option name="LAST_COMMIT_MESSAGE" value="Base Page Widget Class Set Up" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CRMMaster$db.coverage" NAME="db Coverage Results" MODIFIED="1756977183530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$main.coverage" NAME="main Coverage Results" MODIFIED="1757513146682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CRMMaster$run_main.coverage" NAME="run_main Coverage Results" MODIFIED="1758183687043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
-    <SUITE FILE_PATH="coverage/CRMMaster$flake8.coverage" NAME="flake8 Coverage Results" MODIFIED="1758183896391" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
+    <SUITE FILE_PATH="coverage/CRMMaster$run_main.coverage" NAME="run_main Coverage Results" MODIFIED="1758198160162" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
+    <SUITE FILE_PATH="coverage/CRMMaster$flake8.coverage" NAME="flake8 Coverage Results" MODIFIED="1758196378779" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="C:\Users\jowie\PycharmProjects\CRMMaster" />
     <SUITE FILE_PATH="coverage/CRMMaster$testfile.coverage" NAME="testfile Coverage Results" MODIFIED="1757737039907" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$test_database.coverage" NAME="test_database Coverage Results" MODIFIED="1757054197595" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CRMMaster$supplier_form_widget.coverage" NAME="supplier_form_widget Coverage Results" MODIFIED="1757060899387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/supplierdb" />

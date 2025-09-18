@@ -11,14 +11,18 @@ COLUMN_ORDER = [
     'partner_id',
     'partner_name',
     'partner_contact',
-    'description'
+    'description',
+    'created_at',
+    'updated_at'
 ]
 
 HEADERS = [
     'Partner ID',
     'Partner Name',
     'Contact',
-    'Description'
+    'Description',
+    'Created At',
+    'Updated At'
 ]
 
 

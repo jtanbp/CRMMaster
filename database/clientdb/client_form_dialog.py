@@ -22,8 +22,8 @@ client_status = ['Active', 'Inactive']
 
 
 class ClientFormDialog(FormDialog):
-    data_added = Signal(dict)
-    data_edited = Signal(dict)
+    data_added = Signal(dict)  # Required to update in base page widget
+    data_edited = Signal(dict)  # Required to update in base page widget
 
     def __init__(self, parent=None, mode='add', table_name='client', data_dict: dict = None, conn=None):
         super().__init__(parent)
@@ -166,7 +166,8 @@ class ClientFormDialog(FormDialog):
             'description': self.input_desc.toPlainText()
         }
 
-        edit_entity(self.conn, self.table_name, 'client_id', client_data, 'Client')
+        client_data = edit_entity(self.conn, self.table_name, 'client_id',
+                                  client_data, 'Client')
         self.data_edited.emit(client_data)
         self.accept()
 

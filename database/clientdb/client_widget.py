@@ -13,7 +13,9 @@ COLUMN_ORDER = [
     'client_contact',
     'client_type',
     'status',
-    'description'
+    'description',
+    'created_at',
+    'updated_at'
 ]
 
 HEADERS = [
@@ -22,7 +24,9 @@ HEADERS = [
     'Contact',
     'Type',
     'Status',
-    'Description'
+    'Description',
+    'Created At',
+    'Updated At'
 ]
 
 

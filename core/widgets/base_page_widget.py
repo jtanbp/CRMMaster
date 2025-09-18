@@ -1,7 +1,7 @@
 # 1. Standard Library
 
 # 2. Third Party Library
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QDate
 from PySide6.QtWidgets import (
     QComboBox,
     QHBoxLayout,
@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QTableWidget,
     QVBoxLayout,
-    QWidget,
+    QWidget, QDateEdit,
 )
 
 # 3. Internal Library
@@ -31,6 +31,8 @@ class BasePageWidget(QWidget):
     data_added = Signal(dict)
     data_edited = Signal(dict)
 
+    DATE_HEADERS = {'Contract Start', 'Contract End', 'Created At', 'Updated At'}
+
     def __init__(self, parent=None, dev_mode: bool = False, conn=None,
                  table_name: str = None, column_order=None,
                  headers=None, dialog_class=None, data_name=None):
@@ -46,6 +48,8 @@ class BasePageWidget(QWidget):
         # UI elements
         self.refresh_btn = QPushButton('🔄 Refresh')
         self.table = QTableWidget()
+        self.search_bar = QLineEdit()
+        self.date_search = QDateEdit()
         self.filter_box = QComboBox()
         self.data = {}
         self.conn = conn
@@ -80,13 +84,22 @@ class BasePageWidget(QWidget):
         header_layout.addWidget(remove_btn)
 
         # Search bar
-        search_bar = QLineEdit()
-        search_bar.setPlaceholderText(f'Search {self.data_name.lower()}...')
-        search_bar.textChanged.connect(lambda text: filter_table(self, text))
-        header_layout.addWidget(search_bar)
+        self.search_bar.setPlaceholderText(f'Search {self.data_name.lower()}...')
+        self.search_bar.textChanged.connect(lambda text: filter_table(self, text))
+        header_layout.addWidget(self.search_bar)
+
+        # Date edit for filtering
+        self.date_search.dateChanged.connect(
+            lambda date: filter_table(self, date.toString('dd-MM-yyyy'))
+        )
+        self.date_search.setCalendarPopup(True)
+        self.date_search.setDisplayFormat('dd-MM-yyyy')
+        self.date_search.hide()  # default hidden
+        header_layout.addWidget(self.date_search)
 
         # Filter box
         self.filter_box.addItems(self.HEADERS[1:])  # exclude ID
+        self.filter_box.currentIndexChanged.connect(self.on_filter_column_changed)
         header_layout.addWidget(self.filter_box)
 
         header_layout.addStretch()
@@ -96,6 +109,20 @@ class BasePageWidget(QWidget):
         setup_table_headers(self.table, self.HEADERS, stretch_column='Description')
         setup_table_ui(self.table, self.edit_data)
         layout.addWidget(self.table)
+
+    def on_filter_column_changed(self, index: int):
+        """Switch search input depending on column type (date vs text)."""
+        selected_header = self.HEADERS[index + 1]  # offset (exclude ID)
+        if selected_header in self.DATE_HEADERS:
+            self.search_bar.hide()
+            self.date_search.setDate(QDate.currentDate())
+            self.date_search.show()
+            filter_table(self, self.date_search.date().toString('dd-MM-yyyy'))
+        else:
+            self.date_search.hide()
+            self.search_bar.show()
+            self.search_bar.clear()  # reset text filter
+            filter_table(self, '')
 
     def load_data(self):
         query = f'''

@@ -15,7 +15,9 @@ COLUMN_ORDER = [
     'supplier_status',
     'description',
     'contract_start',
-    'contract_end'
+    'contract_end',
+    'created_at',
+    'updated_at'
 ]
 
 HEADERS = [
@@ -26,7 +28,9 @@ HEADERS = [
     'Status',
     'Description',
     'Contract Start',
-    'Contract End'
+    'Contract End',
+    'Created At',
+    'Updated At'
 ]
 
 
