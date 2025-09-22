@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
         self.resize(1200, 600)
 
         self.currency_window = None
+        self.dev_mode = True  # Set this for database access between dev and main
 
         # This will be the main connection for any query to the SQL database
         self.conn = get_connection()
@@ -51,7 +52,7 @@ class MainWindow(QMainWindow):
         self.menu_list = QListWidget()
         self.dock = QDockWidget('Menu', self)
         self.dock.setWidget(self.menu_list)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.dock)   # Left side
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.dock)  # Left side
 
         # Central Area (Stacked Pages)
         self.stack = QStackedWidget()
@@ -77,11 +78,11 @@ class MainWindow(QMainWindow):
         if text == '🏠 Welcome to Home Page':
             layout.addWidget(QLabel(text))
         if text == '📦Supplier':
-            layout.addWidget(SupplierPage(parent=main_window, conn=self.conn))
+            layout.addWidget(SupplierPage(parent=main_window, dev_mode=self.dev_mode, conn=self.conn))
         if text == 'Client':
-            layout.addWidget(ClientPage(parent=main_window, conn=self.conn))
+            layout.addWidget(ClientPage(parent=main_window, dev_mode=self.dev_mode, conn=self.conn))
         if text == 'Partner':
-            layout.addWidget(PartnerPage(parent=main_window, conn=self.conn))
+            layout.addWidget(PartnerPage(parent=main_window, dev_mode=self.dev_mode, conn=self.conn))
         if text == 'Product':
             layout.addWidget(QLabel(text))
         if text == 'Supplier Invoice':
@@ -138,23 +139,15 @@ class MainWindow(QMainWindow):
                 with self.conn.cursor() as cur:
                     cur.execute('SELECT version();')
                     version = cur.fetchone()
-                    QMessageBox.information(
-                        self,
-                        'Database Connection',
-                        f"✅ Connected to PostgreSQL:\n{version[0]}"
-                    )
+                    QMessageBox.information(self, 'Database Connection',
+                                            f"✅ Connected to PostgreSQL:\n{version[0]}"
+                                            )
             except Exception as e:
-                QMessageBox.critical(
-                    self,
-                    'Database Error',
-                    f"⚠️ Query failed:\n{e}"
-                )
+                QMessageBox.critical(self, 'Database Error', f"⚠️ Query failed:\n{e}"
+                                     )
         else:
-            QMessageBox.critical(
-                self,
-                'Database Connection',
-                '❌ Failed to connect to PostgreSQL!'
-            )
+            QMessageBox.critical(self, 'Database Connection', '❌ Failed to connect to PostgreSQL!'
+                                 )
 
     def show_currency_window(self):
         self.currency_window = CurrencyWindow()
